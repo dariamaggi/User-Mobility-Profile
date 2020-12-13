@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d7d74c9c-84e1-47e8-82dd-b97d48b12053" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/car_control_module/transformation.py" afterDir="false" />
-    </list>
+    <list default="true" id="d7d74c9c-84e1-47e8-82dd-b97d48b12053" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,17 +9,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/car_control_module/transformation.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="32" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -51,11 +38,6 @@
             <path>
               <item name="AutomativeSystem" type="b2602c69:ProjectViewProjectNode" />
               <item name="AutomativeSystem" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AutomativeSystem" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AutomativeSystem" type="462c0819:PsiDirectoryNode" />
-              <item name="car_control_module" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -93,16 +75,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1607881015529</updated>
-      <workItem from="1607881016689" duration="44000" />
+      <workItem from="1607881016689" duration="241000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="44000" />
+    <option name="totallyTimeSpent" value="241000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="60" y="373" width="1680" height="851" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49603623" visible="true" weight="0.0958486" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -135,7 +116,7 @@
     <entry file="file://$PROJECT_DIR$/car_control_module/transformation.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
-          <caret line="3" column="32" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
+          <caret line="3" column="32" lean-forward="true" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
         </state>
       </provider>
     </entry>
