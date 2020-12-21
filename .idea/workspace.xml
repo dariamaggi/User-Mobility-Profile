@@ -1,72 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d7d74c9c-84e1-47e8-82dd-b97d48b12053" name="Default Changelist" comment="" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <list default="true" id="d7d74c9c-84e1-47e8-82dd-b97d48b12053" name="Default Changelist" comment="Add .gitignore">
+      <change afterPath="$PROJECT_DIR$/CarControlModule/src/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UserMobilityProfileManagerModule/src/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/AutomativeSystem.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/general scheme.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/general scheme.jpg" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileEditorManager">
-    <leaf />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/car_control_module/transformation.py" />
-      </list>
-    </option>
-  </component>
+  <component name="JupyterTrust" id="190a2af4-52c1-4ac1-813c-fa5c5bece5fe" />
   <component name="ProjectFrameBounds">
     <option name="x" value="60" />
     <option name="y" value="373" />
     <option name="width" value="1680" />
     <option name="height" value="851" />
   </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="AutomativeSystem" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AutomativeSystem" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
+  <component name="ProjectId" id="1lyLpAxRRaOcVlM4BYDe54cMvkv" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/CarControlModule/src" />
+      <recent name="$PROJECT_DIR$/CarControlModule" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/UserMobilityProfileManagerModule/src" />
+      <recent name="$PROJECT_DIR$/UserMobilityProfileManager/src" />
+    </key>
   </component>
+  <component name="RunManager" selected="Python.UserMobilityProfileManagerModule">
+    <configuration name="CarControlModule" type="PythonConfigurationType" factoryName="Python">
+      <module name="AutomativeSystem" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/local/bin/python3.6" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/CarControlModule/src" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CarControlModule/src/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="UserMobilityProfileManagerModule" type="PythonConfigurationType" factoryName="Python">
+      <module name="AutomativeSystem" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/local/bin/python3.6" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/UserMobilityProfileManagerModule/src" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/UserMobilityProfileManagerModule/src/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="AutomativeSystem" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/local/bin/python3.6" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/CarControlModule/src" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CarControlModule/src/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.UserMobilityProfileManagerModule" />
+      <item itemvalue="Python.CarControlModule" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
-    <configuration />
+    <configuration>$USER_HOME$/.subversion</configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -76,49 +144,76 @@
       <option name="presentableId" value="Default" />
       <updated>1607881015529</updated>
       <workItem from="1607881016689" duration="241000" />
+      <workItem from="1608564566126" duration="1939000" />
+      <workItem from="1608566542309" duration="451000" />
+      <workItem from="1608567005311" duration="434000" />
     </task>
+    <task id="LOCAL-00001" summary="Add .gitignore">
+      <created>1608567154962</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1608567154962</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="241000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="60" y="373" width="1680" height="851" extended-state="0" />
-    <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49603623" visible="true" weight="0.0958486" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" sideWeight="0.50396377" side_tool="true" weight="0.09076262" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.64285713" weight="0.4642857" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4785177" weight="0.398641" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="Python Console" order="6" sideWeight="0.49785176" weight="0.40996602" />
-      <window_info anchor="bottom" id="TODO" order="7" weight="0.3295583" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.5644468" weight="0.22989808" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.43555316" side_tool="true" weight="0.23895809" />
-      <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" order="12" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Data View" order="3" weight="0.32975295" />
-      <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="right" id="SciView" order="5" />
-    </layout>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="3" />
   </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/car_control_module/transformation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="32" lean-forward="true" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add .gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add .gitignore" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="424" y="199" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1608566502673">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="424" y="199" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566403439" />
+    <state x="424" y="199" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566502673" />
+    <state x="534" y="112" key="CommitChangelistDialog2" timestamp="1608567407440">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="534" y="112" key="CommitChangelistDialog2/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608567407440" />
+    <state width="1878" height="270" key="GridCell.Tab.0.bottom" timestamp="1608566529877">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="440" key="GridCell.Tab.0.bottom/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566410420" />
+    <state width="1878" height="270" key="GridCell.Tab.0.bottom/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566529877" />
+    <state width="1878" height="270" key="GridCell.Tab.0.center" timestamp="1608566529876">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="440" key="GridCell.Tab.0.center/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566410418" />
+    <state width="1878" height="270" key="GridCell.Tab.0.center/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566529876" />
+    <state width="1878" height="270" key="GridCell.Tab.0.left" timestamp="1608566529876">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="440" key="GridCell.Tab.0.left/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566410417" />
+    <state width="1878" height="270" key="GridCell.Tab.0.left/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566529876" />
+    <state width="1878" height="270" key="GridCell.Tab.0.right" timestamp="1608566529877">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="440" key="GridCell.Tab.0.right/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566410419" />
+    <state width="1878" height="270" key="GridCell.Tab.0.right/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566529877" />
+    <state x="469" y="176" key="SettingsEditor" timestamp="1608566996002">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="469" y="176" key="SettingsEditor/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566996002" />
+    <state x="469" y="176" key="SettingsEditor/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566527997" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/User_Mobility_Profile$UserMobilityProfileManagerModule.coverage" NAME="UserMobilityProfileManagerModule Coverage Results" MODIFIED="1608566410402" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/UserMobilityProfileManagerModule/src" />
+    <SUITE FILE_PATH="coverage/User_Mobility_Profile$python.coverage" NAME="python Coverage Results" MODIFIED="1608566266406" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
