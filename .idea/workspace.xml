@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d7d74c9c-84e1-47e8-82dd-b97d48b12053" name="Default Changelist" comment="Add .gitignore">
-      <change afterPath="$PROJECT_DIR$/CarControlModule/src/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UserMobilityProfileManagerModule/src/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/AutomativeSystem.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/general scheme.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/general scheme.jpg" afterDir="false" />
-    </list>
+    <list default="true" id="d7d74c9c-84e1-47e8-82dd-b97d48b12053" name="Default Changelist" comment="add general directory structure" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -128,8 +117,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.UserMobilityProfileManagerModule" />
       <item itemvalue="Python.CarControlModule" />
+      <item itemvalue="Python.UserMobilityProfileManagerModule" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -146,7 +135,7 @@
       <workItem from="1607881016689" duration="241000" />
       <workItem from="1608564566126" duration="1939000" />
       <workItem from="1608566542309" duration="451000" />
-      <workItem from="1608567005311" duration="434000" />
+      <workItem from="1608567005311" duration="758000" />
     </task>
     <task id="LOCAL-00001" summary="Add .gitignore">
       <created>1608567154962</created>
@@ -155,7 +144,21 @@
       <option name="project" value="LOCAL" />
       <updated>1608567154962</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="remove .idea">
+      <created>1608567515803</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1608567515803</updated>
+    </task>
+    <task id="LOCAL-00003" summary="add general directory structure">
+      <created>1608567584915</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1608567584916</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -174,7 +177,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add .gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add .gitignore" />
+    <MESSAGE value="remove .idea" />
+    <MESSAGE value="add general directory structure" />
+    <option name="LAST_COMMIT_MESSAGE" value="add general directory structure" />
   </component>
   <component name="WindowStateProjectService">
     <state x="424" y="199" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1608566502673">
@@ -206,11 +211,23 @@
     </state>
     <state width="1878" height="440" key="GridCell.Tab.0.right/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566410419" />
     <state width="1878" height="270" key="GridCell.Tab.0.right/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566529877" />
+    <state x="548" y="279" key="IDE.errors.dialog" timestamp="1608567605777">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="548" y="279" key="IDE.errors.dialog/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608567605777" />
+    <state x="683" y="246" key="RollbackChangesDialog" timestamp="1608567771298">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="683" y="246" key="RollbackChangesDialog/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608567771298" />
     <state x="469" y="176" key="SettingsEditor" timestamp="1608566996002">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="469" y="176" key="SettingsEditor/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608566996002" />
     <state x="469" y="176" key="SettingsEditor/0.0.1920.1080/-1792.25.1792.1095@0.0.1920.1080" timestamp="1608566527997" />
+    <state x="560" y="277" key="Vcs.Push.Dialog.v2" timestamp="1608567591411">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="560" y="277" key="Vcs.Push.Dialog.v2/0.0.1920.1080/-1792.0.1792.1120@0.0.1920.1080" timestamp="1608567591411" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/User_Mobility_Profile$UserMobilityProfileManagerModule.coverage" NAME="UserMobilityProfileManagerModule Coverage Results" MODIFIED="1608566410402" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/UserMobilityProfileManagerModule/src" />
