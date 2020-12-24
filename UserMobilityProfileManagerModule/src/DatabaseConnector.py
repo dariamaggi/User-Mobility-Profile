@@ -1,10 +1,46 @@
 from pymongo import MongoClient
 from random import randint
+from PIL import Image
+import io
 
 
 def rundb():
     _client = MongoClient('mongodb://127.0.0.1:27017')
     db = _client.UserProfileManagerDB
+
+
+# TODO: ricorda di gestire id di user mobility profile main logic differente dal db
+def read_from_ump(user_id, col, field):
+    return col.users.find({'_id': user_id}, {field: 1, '_id': 0})
+
+
+def modify_to_ump(user_id, col, field, value):
+    return col.users.update_one({'id': user_id}, {field: value})
+
+
+def insert_user(col, value):
+    return col.users.insert_one(value)  # Return the ID
+
+
+def delete_user(user_id, col):
+    return col.users.delete_one({'_id': user_id})
+
+
+def insert_image(user_id, col, image_dir):
+    im = Image.open(image_dir)
+    image_bytes = io.BytesIO()
+    im.save(image_bytes, format='PNG')
+    image_id = col.images.insert_one(image_bytes.getvalue())
+
+    return modify_to_ump(user_id, col, 'image', image_id)
+
+
+def get_all_images(col):
+    return col.images.find({})
+    #READ AN IMM
+    # pil_img = Image.open(io.BytesIO(image['data']))
+    # plt.imshow(pil_img)
+    # plt.show()
 
 
 def populate_db():
@@ -32,7 +68,7 @@ def populate_db():
     service_list = [{'Amazon prime', 'Netflix'}, {'Sky', 'Netflix'}]
 
     for x in range(1, 3):
-        UserProfileManagerDB = {
+        user_profile_manager_db = {
             'Name': names[randint(0, (len(names) - 1))],
             'surname': surname[randint(0, (len(surname) - 1))],
             'gender': gender[randint(0, (len(gender) - 1))],
@@ -51,7 +87,7 @@ def populate_db():
             # 'service_list': service_list[randint(0, (len(service_list) - 1))]
         }
         # Step 3: Insert business object directly into MongoDB via isnert_one
-        result = db.users.insert_one(UserProfileManagerDB)
+        result = db.users.insert_one(user_profile_manager_db)
         # Step 4: Print to the console the ObjectID of the new document
         print('Created {0} of 500 as {1}'.format(x, result.inserted_id))
     # Step 5: Tell us that you are done
