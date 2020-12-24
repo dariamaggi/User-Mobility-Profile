@@ -26,21 +26,22 @@ class Example(Frame):
         #self.scrollbary = Scrollbar(self.labelframe)
 
         self.listbox = Listbox(self.labelframe )
-        self.listbox.insert(END, "Riccardo Bertini")
-        self.listbox.insert(END, "Ajeje Brazorf")
-        self.listbox.insert(END, "Federico Lapenna")
-
+        scrollbar = Scrollbar(self.master)
+        scrollbar.pack(side=RIGHT, fill=Y)
         self.listbox1 = Listbox(self.labelframe1 )
         self.listbox1.pack(expand="yes", fill=BOTH)
 
+        self.listbox1.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.listbox1.yview)
 
-      #  self.scrollbary.config(command=listbox.yview)
+        #  self.scrollbary.config(command=listbox.yview)
         self.listbox.configure(justify=CENTER)
         self.listbox.pack(expand="yes", fill=BOTH)
       #  self.scrollbary.pack(side=RIGHT, fill=Y)
         self.listbox.bind('<<ListboxSelect>>', self.onselect)
         right = Label(self.labelframe)
         right.pack()
+
 
     def listbox_insert(self, value):
         self.listbox1.insert(END, str(datetime.datetime.now())+":"+"You opened user profile: "+value)
