@@ -1,9 +1,6 @@
 from tkinter import *
 
-
-
-
-from tkinter import Tk, Frame, Menu
+import datetime
 
 class Example(Frame):
 
@@ -33,6 +30,9 @@ class Example(Frame):
         self.listbox.insert(END, "Ajeje Brazorf")
         self.listbox.insert(END, "Federico Lapenna")
 
+        self.listbox1 = Listbox(self.labelframe1 )
+        self.listbox1.pack(expand="yes", fill=BOTH)
+
 
       #  self.scrollbary.config(command=listbox.yview)
         self.listbox.configure(justify=CENTER)
@@ -41,18 +41,16 @@ class Example(Frame):
         self.listbox.bind('<<ListboxSelect>>', self.onselect)
         right = Label(self.labelframe)
         right.pack()
-    def listbox_insert(self, value):
-        self.listbox.insert(END, value)
 
+    def listbox_insert(self, value):
+        self.listbox1.insert(END, str(datetime.datetime.now())+":"+"You opened user profile: "+value)
 
     def onselect(self, evt):
         # Note here that Tkinter passes an event object to onselect()
         w = evt.widget
         index = int(w.curselection()[0])
         value = w.get(index)
-        print(value)
-
-
+        self.listbox_insert(value)
 
     def setMenu(self):
         menubar = Menu(self.master)
