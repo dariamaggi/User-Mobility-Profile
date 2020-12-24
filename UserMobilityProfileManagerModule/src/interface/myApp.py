@@ -38,9 +38,21 @@ class Example(Frame):
         self.listbox.configure(justify=CENTER)
         self.listbox.pack(expand="yes", fill=BOTH)
       #  self.scrollbary.pack(side=RIGHT, fill=Y)
-
+        self.listbox.bind('<<ListboxSelect>>', self.onselect)
         right = Label(self.labelframe)
         right.pack()
+    def listbox_insert(self, value):
+        self.listbox.insert(END, value)
+
+
+    def onselect(self, evt):
+        # Note here that Tkinter passes an event object to onselect()
+        w = evt.widget
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        print(value)
+
+
 
     def setMenu(self):
         menubar = Menu(self.master)
