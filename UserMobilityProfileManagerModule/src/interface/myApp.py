@@ -2,7 +2,10 @@ from tkinter import *
 
 import datetime
 from tkinter.messagebox import showinfo
-class Example(Frame):
+
+
+
+class MainWindow(Frame):
 
     def __init__(self):
         super().__init__()
@@ -53,6 +56,8 @@ class Example(Frame):
         index = int(w.curselection()[0])
         value = w.get(index)
         self.listbox_insert(value)
+        self.create_window(value)
+
 
     def initUI(self):
 
@@ -68,7 +73,6 @@ class Example(Frame):
 
     def buildMenu(self):
 
-        self.master.title("Simple Menu")
         menubar = Menu(self.master)
         self.master.config(menu = menubar)
 
@@ -88,12 +92,23 @@ class Example(Frame):
 
         self.quit()
 
+    def create_window(self, value):
+        self.counter = 1
+        t = Toplevel(self)
+        t.wm_title("User Mobility Profile - "+ value)
+        t.geometry("560x560+350+300")
+
+
+#      l = Label(t, text="This is window #%s" % self.counter)
+  #      l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
+
+
 
 def main():
 
     root = Tk()
     root.geometry("560x560+300+300")
-    app = Example()
+    app = MainWindow()
     root.mainloop()
 
 
