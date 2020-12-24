@@ -23,21 +23,25 @@ class Example(Frame):
 
         self.labelframe1.pack(fill="both", expand="yes")
 
-        #self.scrollbary = Scrollbar(self.labelframe)
+        vsb = Scrollbar(self.labelframe, orient="vertical")
+        vsb1 = Scrollbar(self.labelframe1, orient="vertical")
 
-        self.listbox = Listbox(self.labelframe )
-        scrollbar = Scrollbar(self.master)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        self.listbox1 = Listbox(self.labelframe1 )
+        self.listbox = Listbox(self.labelframe, yscrollcommand=vsb.set)
+        [self.listbox.insert(END, "value"+str(i)) for i in range(19)]
+        self.listbox1 = Listbox(self.labelframe1,  yscrollcommand=vsb1.set)
+
+
+        vsb.pack(side="right", fill="y")
+        vsb.config(command=self.listbox.yview)
+
+        vsb1.pack(side="right", fill="y")
+        vsb1.config(command=self.listbox1.yview)
+
         self.listbox1.pack(expand="yes", fill=BOTH)
 
-        self.listbox1.config(yscrollcommand=scrollbar.set)
-        scrollbar.config(command=self.listbox1.yview)
-
-        #  self.scrollbary.config(command=listbox.yview)
         self.listbox.configure(justify=CENTER)
         self.listbox.pack(expand="yes", fill=BOTH)
-      #  self.scrollbary.pack(side=RIGHT, fill=Y)
+
         self.listbox.bind('<<ListboxSelect>>', self.onselect)
         right = Label(self.labelframe)
         right.pack()
@@ -47,7 +51,7 @@ class Example(Frame):
         self.listbox1.insert(END, str(datetime.datetime.now())+":"+"You opened user profile: "+value)
 
     def onselect(self, evt):
-        # Note here that Tkinter passes an event object to onselect()
+
         w = evt.widget
         index = int(w.curselection()[0])
         value = w.get(index)
