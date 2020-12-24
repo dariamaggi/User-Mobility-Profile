@@ -21,23 +21,22 @@ class Example(Frame):
         left = Label(self.labelframe)
         left.pack()
 
-        labelframe1 = LabelFrame(self.master, text= "Console Log")
+        self.labelframe1 = LabelFrame(self.master, text= "Console Log")
 
-        labelframe1.pack(fill="both", expand="yes")
-        scrollbary = Scrollbar(self.labelframe)
-        scrollbarx = Scrollbar(self.labelframe, orient=HORIZONTAL)
+        self.labelframe1.pack(fill="both", expand="yes")
 
-        listbox = Listbox(self.labelframe, yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
-        listbox.insert(END, "Riccardo Bertini")
-        listbox.insert(END, "Ajeje Brazorf")
+        #self.scrollbary = Scrollbar(self.labelframe)
+
+        self.listbox = Listbox(self.labelframe )
+        self.listbox.insert(END, "Riccardo Bertini")
+        self.listbox.insert(END, "Ajeje Brazorf")
+        self.listbox.insert(END, "Federico Lapenna")
 
 
-        scrollbary.config(command=listbox.yview)
-        scrollbarx.config(command=listbox.xview)
-        scrollbarx.pack(side=BOTTOM, fill=X)
-
-        listbox.pack(side=LEFT, fill=BOTH)
-        scrollbary.pack(side=RIGHT, fill=Y)
+      #  self.scrollbary.config(command=listbox.yview)
+        self.listbox.configure(justify=CENTER)
+        self.listbox.pack(expand="yes", fill=BOTH)
+      #  self.scrollbary.pack(side=RIGHT, fill=Y)
 
         right = Label(self.labelframe)
         right.pack()
