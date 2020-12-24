@@ -23,6 +23,7 @@ class Example(Frame):
 
         self.labelframe1 = LabelFrame(self.master, text= "Console Log")
 
+
         self.labelframe1.pack(fill="both", expand="yes")
 
         #self.scrollbary = Scrollbar(self.labelframe)
