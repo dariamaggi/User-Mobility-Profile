@@ -110,10 +110,6 @@ class MainWindow(Frame):
 
         vsb1 = Scrollbar(l_frame, orient="vertical")
 
-        #IMAGE
-        img = ImageTk.PhotoImage(Image.open("True1.gif"))#TODO: fix
-        panel = Label(t, image=img)
-        panel.pack(side="bottom", fill="both", expand="yes")
 
         listbox1 = Listbox(l_frame, yscrollcommand=vsb1.set)
 
