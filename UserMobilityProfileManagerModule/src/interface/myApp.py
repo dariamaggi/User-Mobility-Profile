@@ -1,5 +1,5 @@
 from tkinter import *
-
+from PIL import ImageTk, Image
 import datetime
 from tkinter.messagebox import showinfo
 
@@ -63,7 +63,7 @@ class MainWindow(Frame):
         index = int(w.curselection()[0])
         value = w.get(index)
         self.listbox_insert(value)
-        self.create_window(value)
+        self.openProfile(value)
 
     def initUI(self):
         self.master.title("User Mobility Profile")
@@ -97,16 +97,42 @@ class MainWindow(Frame):
     def onExit(self):
         self.quit()
 
-    def create_window(self, value):
+    def openProfile(self, value):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - "+ value)
-        t.geometry("5800x560+350+300")
+        t.geometry("580x560+350+300")
+
+        u_frame= LabelFrame(t)
+        u_frame.pack(fill="both", expand="yes")
+
+        l_frame = LabelFrame(t, text= "Console Log")
+        l_frame.pack(fill="both", expand="yes")
+
+        vsb1 = Scrollbar(l_frame, orient="vertical")
+
+        #IMAGE
+        img = ImageTk.PhotoImage(Image.open("True1.gif"))#TODO: fix
+        panel = Label(t, image=img)
+        panel.pack(side="bottom", fill="both", expand="yes")
+
+        listbox1 = Listbox(l_frame, yscrollcommand=vsb1.set)
+
+
+        vsb1.pack(side="right", fill="y")
+        vsb1.config(command=listbox1.yview)
+
+        listbox1.pack(expand="yes", fill=BOTH)
+
+        [listbox1.insert(END, elem) for elem in  self.listbox1.get(0, self.listbox1.size() - 1)]
+
+
+
     def addUser(self):
 
         t = Toplevel(self)
         t.wm_title("Registration Form")
         t.geometry("560x560+350+300")
-        
+
         lbl_result = Label(t, text=" Registration Form", font=('lato', 18),justify=LEFT)
         lbl_result.grid(row=3,column=2, columnspan=3)
 
