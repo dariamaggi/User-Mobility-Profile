@@ -22,37 +22,27 @@ class MainWindow(Frame):
 
 
     def buildFrames(self):
-
-        self.labelframe = LabelFrame(self.master, text= "Currently Loaded User Mobility Profiles")
-        self.labelframe.pack(fill="both", expand="yes")
-        left = Label(self.labelframe)
+        left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18,background='light green')
         left.pack()
+        self.labelframe = LabelFrame(self.master, background='light green')
+        self.labelframe.pack()
+        counter = 0
+        Lbl_1=Label(self.labelframe, text=" Registration Form", font=('lato', 18),justify=CENTER, bd=18).grid(row=1, column=(counter+1)%3)
+        counter+=1
+        Lbl_2=Label(self.labelframe, text=" Registration Form", font=('lato', 18),justify=CENTER, bd=18).grid(row=1, column=(counter+1)%3)
+        counter+=1
+        Lbl_3=Label(self.labelframe, text=" Registration Form", font=('lato', 18),justify=CENTER, bd=18).grid(row=1, column=(counter+1)%3)
+        right = Label(self.master, font=('lato', 18), text="Console Log", bd=18,
+                     background='light green').pack()
+        self.labelframe1=LabelFrame(self.master,background='light green')
+        self.labelframe1.pack(expand="yes", fill=BOTH)
+        vsb1 = Scrollbar(self.labelframe1, orient="vertical",background='light green')
 
-        self.labelframe1 = LabelFrame(self.master, text= "Console Log")
-        self.labelframe1.pack(fill="both", expand="yes")
-
-        vsb = Scrollbar(self.labelframe, orient="vertical")
-        vsb1 = Scrollbar(self.labelframe1, orient="vertical")
-
-        self.listbox = Listbox(self.labelframe, yscrollcommand=vsb.set)
-        [self.listbox.insert(END, "value"+str(i)) for i in range(19)]
-        self.listbox1 = Listbox(self.labelframe1,  yscrollcommand=vsb1.set)
-
-
-        vsb.pack(side="right", fill="y")
-        vsb.config(command=self.listbox.yview)
-
+        self.listbox1 = Listbox(self.labelframe1,yscrollcommand=vsb1.set)
         vsb1.pack(side="right", fill="y")
         vsb1.config(command=self.listbox1.yview)
 
         self.listbox1.pack(expand="yes", fill=BOTH)
-
-        self.listbox.configure(justify=CENTER)
-        self.listbox.pack(expand="yes", fill=BOTH)
-
-        self.listbox.bind('<<ListboxSelect>>', self.onselect)
-        right = Label(self.labelframe1)
-        right.pack()
 
 
     def listbox_insert(self, value):
@@ -102,12 +92,19 @@ class MainWindow(Frame):
         t.wm_title("User Mobility Profile - "+ value)
         t.geometry("580x560+350+300")
 
-        u_frame= LabelFrame(t)
+        u_frame= LabelFrame(t, background="light green")
         u_frame.pack(fill="both", expand="yes")
+        left = Label(u_frame, font=('lato', 18), text="User Profile -"+value, background='light green', bd=18)
 
-        l_frame = LabelFrame(t, text= "Console Log")
+        # label with image
+        l_frame= LabelFrame(t, background="light green")
         l_frame.pack(fill="both", expand="yes")
 
+
+        left.pack()
+        listbox = Listbox(u_frame).pack(expand="yes", fill=BOTH)
+        right = Label(u_frame, font=('lato', 18), text="Console Log", background='light green', bd=18)
+        right.pack()
         vsb1 = Scrollbar(l_frame, orient="vertical")
 
 
@@ -121,10 +118,12 @@ class MainWindow(Frame):
 
         [listbox1.insert(END, elem) for elem in  self.listbox1.get(0, self.listbox1.size() - 1)]
 
+        #TODO: handle image
 
 
     def addUser(self):
-
+        print("TODO")
+        '''
         t = Toplevel(self)
         t.wm_title("Registration Form")
         t.geometry("560x560+350+300")
@@ -174,7 +173,7 @@ class MainWindow(Frame):
 
         t.mainloop()
 
-'''
+
         #lbl_username = Label(t, text="Name:", bd=18)
         #lbl_username.grid(row=1, column=1)
         lbl_password = Label(t, text="Surname:", bd=18)
@@ -215,6 +214,7 @@ def main():
 
     root = Tk()
     root.geometry("560x560+300+300")
+    root.configure(background='light green')
     app = MainWindow()
     root.mainloop()
 
