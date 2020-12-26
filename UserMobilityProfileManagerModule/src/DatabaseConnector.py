@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 from random import randint
-from PIL import Image
-import io
+import gridfs
 
 
 def rundb():
@@ -10,8 +9,12 @@ def rundb():
 
 
 # TODO: ricorda di gestire id di user mobility profile main logic differente dal db
-def read_from_ump(user_id, col, field):
-    return col.users.find({'_id': user_id}, {field: 1, '_id': 0})
+def read_field_from_ump(user_id, col, field):
+    return col.users.find_one({'_id': user_id}, {field: 1, '_id': 0})
+
+
+def read_all_from_ump(user_id, col):
+    return col.users.find_one({'_id': user_id})
 
 
 def modify_to_ump(user_id, col, field, value):
@@ -26,21 +29,45 @@ def delete_user(user_id, col):
     return col.users.delete_one({'_id': user_id})
 
 
-def insert_image(user_id, col, image_dir):
-    im = Image.open(image_dir)
-    image_bytes = io.BytesIO()
-    im.save(image_bytes, format='PNG')
-    image_id = col.images.insert_one(image_bytes.getvalue())
+def insert_image(db, image, user_id):
+    image_id = insert_file(db, image)
+    return modify_to_ump(user_id, db, 'image', image_id)  # TODO:deve essere una collezione
 
-    return modify_to_ump(user_id, col, 'image', image_id)
+
+def insert_audio(db, audio, user_id):
+    image_id = insert_file(db, audio)
+    return modify_to_ump(user_id, db, 'audio', image_id)  # TODO:deve essere una collezione
+
+
+def get_image_by_id(db, user_id):
+    fs = gridfs.GridFS(db)
+    out = fs.get(read_field_from_ump(user_id, db, 'image')).read()
+
+    output = open(user_id + '_photo.jpg', 'wb')
+    output.write(out)
+    output.close()
+
+
+def get_audio_by_id(db, user_id):
+    fs = gridfs.GridFS(db)
+    out = fs.get(read_field_from_ump(user_id, db, 'audio')).read()
+
+    output = open(user_id + '_audio.mp3', 'wb')
+    output.write(out)
+    output.close()
+
+
+def insert_file(db, file):
+    fs = gridfs.GridFS(db)
+    data = open(file, 'rb')
+    the_data = data.read()
+    stored = fs.put(the_data)
+
+    return stored
 
 
 def get_all_images(col):
     return col.images.find({})
-    #READ AN IMM
-    # pil_img = Image.open(io.BytesIO(image['data']))
-    # plt.imshow(pil_img)
-    # plt.show()
 
 
 def populate_db():
