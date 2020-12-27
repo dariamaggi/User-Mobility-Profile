@@ -23,6 +23,7 @@ class MainWindow(Frame):
     def populateMethod(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now())+": opened profile: "+ method)
         self.openProfile(method)
+        read_field_from_ump()
 
     def set_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
