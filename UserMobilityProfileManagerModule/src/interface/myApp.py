@@ -20,22 +20,40 @@ class MainWindow(Frame):
         self.users=[]
         self.initUI()
 
+    def populateMethod(self, method):
+        self.listbox1.insert(END, str(datetime.datetime.now())+": opened profile: "+ method)
+        self.openProfile(method)
 
+    def set_scrollregion(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
     def buildFrames(self):
         left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18,background='light green')
         left.pack()
-        self.labelframe = LabelFrame(self.master, background='light green')
-        self.labelframe.pack()
-        counter = 0
-        Lbl_1=Label(self.labelframe, text=" Registration Form", font=('lato', 18),justify=CENTER, bd=18).grid(row=1, column=(counter+1)%3)
-        counter+=1
-        Lbl_2=Label(self.labelframe, text=" Registration Form", font=('lato', 18),justify=CENTER, bd=18).grid(row=1, column=(counter+1)%3)
-        counter+=1
-        Lbl_3=Label(self.labelframe, text=" Registration Form", font=('lato', 18),justify=CENTER, bd=18).grid(row=1, column=(counter+1)%3)
-        right = Label(self.master, font=('lato', 18), text="Console Log", bd=18,
-                     background='light green').pack()
+
+        self.canvas = Canvas(self.master)
+        self.canvas.pack(side=TOP, expand=TRUE)
+
+        i=1
+        for method in ["Lucas", "John", "Bob"]:
+            button = Button(self.canvas, text=method,
+                            command=lambda m=method: self.populateMethod(m),font=('lato', 18), bd=18)
+            button.grid(row=0,column=i)
+            i+=1
+            if i%3==0:
+                i=0
+                button = Button(self.canvas, text=method,
+                                command=lambda m=method: self.populateMethod(m), font=('lato', 18), bd=18)
+                button.grid(row=1, column=i)
+
+
+        self.frame = Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.frame, anchor=NW)
+        self.frame.bind('<Configure>', self.set_scrollregion)
+
+
         self.labelframe1=LabelFrame(self.master,background='light green')
         self.labelframe1.pack(expand="yes", fill=BOTH)
+        title= Label(self.labelframe1,text="Console Log", font=('lato', 18), bd=18, background="light green").pack()
         vsb1 = Scrollbar(self.labelframe1, orient="vertical",background='light green')
 
         self.listbox1 = Listbox(self.labelframe1,yscrollcommand=vsb1.set)
