@@ -3,9 +3,15 @@ from random import randint
 import gridfs
 
 
+# TODO:gestisci passaggio di parametri con file di configurazione
+
 def rundb():
     _client = MongoClient('mongodb://127.0.0.1:27017')
     db = _client.UserProfileManagerDB
+
+
+def get_random_user(col):
+    return col.users.find_one()
 
 
 # TODO: ricorda di gestire id di user mobility profile main logic differente dal db
@@ -18,7 +24,8 @@ def read_all_from_ump(user_id, col):
 
 
 def modify_to_ump(user_id, col, field, value):
-    return col.users.update_one({'id': user_id}, {field: value})
+    return col.users.update_one({'_id': user_id},
+                                {'$set': {field: value}})
 
 
 def insert_user(col, value):
@@ -31,30 +38,36 @@ def delete_user(user_id, col):
 
 def insert_image(db, image, user_id):
     image_id = insert_file(db, image)
-    return modify_to_ump(user_id, db, 'image', image_id)  # TODO:deve essere una collezione
+    return modify_to_ump(user_id, db, 'image', image_id)
 
 
 def insert_audio(db, audio, user_id):
-    image_id = insert_file(db, audio)
-    return modify_to_ump(user_id, db, 'audio', image_id)  # TODO:deve essere una collezione
+    audio_id = insert_file(db, audio)
+    return modify_to_ump(user_id, db, 'audio', audio_id)
 
 
 def get_image_by_id(db, user_id):
     fs = gridfs.GridFS(db)
-    out = fs.get(read_field_from_ump(user_id, db, 'image')).read()
+    image_id = read_field_from_ump(user_id, db, 'image')
+    if image_id:
+        out = fs.get(image_id['image']).read()
+        output = open(str(user_id) + '.jpg', 'wb')
+        output.write(out)
+        output.close()
 
-    output = open(user_id + '_photo.jpg', 'wb')
-    output.write(out)
-    output.close()
+    return 1
 
 
 def get_audio_by_id(db, user_id):
     fs = gridfs.GridFS(db)
-    out = fs.get(read_field_from_ump(user_id, db, 'audio')).read()
+    audio_id = read_field_from_ump(user_id, db, 'audio')
+    if audio_id:
+        out = fs.get(audio_id['audio']).read()
+        output = open(str(user_id) + '.mp3', 'wb')
+        output.write(out)
+        output.close()
 
-    output = open(user_id + '_audio.mp3', 'wb')
-    output.write(out)
-    output.close()
+    return 1
 
 
 def insert_file(db, file):
@@ -67,7 +80,52 @@ def insert_file(db, file):
 
 
 def get_all_images(col):
-    return col.images.find({})
+    users = col.users.find().distinct('_id')
+    try:
+        for user in users:
+            get_image_by_id(col, user)
+    except:
+        return 1
+
+    return 0
+
+
+def get_all_audio(col):
+    users = col.users.find().distinct('_id')
+    try:
+        for user in users:
+            get_audio_by_id(col, user)
+    except:
+        return 1
+
+    return 0
+
+
+def create_user(db, user):
+    return db.users.insert_one(user)
+
+
+def create_user_json(user):  # Use it only for test
+    user_profile_manager_db = {
+        'Name': user[0],
+        'surname': user[1],
+        'gender': user[2],
+        'age': user[3],
+        'country': user[4],
+        'home_location': user[5],
+        'job_location': user[6],
+        'driving_style': user[7],
+        'seat_inclination': user[8],
+        'seat_orientation': user[9],
+        'temperature_level': user[10],
+        'light_level': user[11],
+        'music_genres': user[12],
+        'music_volume': user[13],
+        # 'application_list': application_list[randint(0, (len(application_list) - 1))],
+        # 'service_list': service_list[randint(0, (len(service_list) - 1))]
+    }
+
+    return user_profile_manager_db
 
 
 def populate_db():
@@ -91,8 +149,8 @@ def populate_db():
     light_level = ['low', 'medium', 'high']
     music_genres = ['Metal', 'rap']
     music_volume = ['moderate', 'high']
-    application_list = [{'Facebook', 'youtube'}, {'Facebook', 'Telegram'}, {'Instagram', 'youtube'}]
-    service_list = [{'Amazon prime', 'Netflix'}, {'Sky', 'Netflix'}]
+    application_list = ['Facebook', 'youtube']
+    service_list = ['Amazon prime', 'Netflix']
 
     for x in range(1, 3):
         user_profile_manager_db = {
@@ -110,8 +168,8 @@ def populate_db():
             'light_level': light_level[randint(0, (len(light_level) - 1))],
             'music_genres': music_genres[randint(0, (len(music_genres) - 1))],
             'music_volume': music_volume[randint(0, (len(music_volume) - 1))],
-            # 'application_list': application_list[randint(0, (len(application_list) - 1))],
-            # 'service_list': service_list[randint(0, (len(service_list) - 1))]
+            'application_list': application_list,
+            'service_list': service_list
         }
         # Step 3: Insert business object directly into MongoDB via isnert_one
         result = db.users.insert_one(user_profile_manager_db)
