@@ -2,7 +2,7 @@ from tkinter import *
 from PIL import ImageTk, Image
 import datetime
 from tkinter.messagebox import showinfo
-
+from json import loads
 
 class UserProfile(Frame):
     def __init__(self, value):
@@ -23,12 +23,11 @@ class MainWindow(Frame):
     def populateMethod(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now())+": opened profile: "+ method)
         self.openProfile(method)
-        read_field_from_ump()
 
     def set_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
     def buildFrames(self):
-        left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18,background='light green')
+        left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18)
         left.pack()
 
         self.canvas = Canvas(self.master)
@@ -52,10 +51,10 @@ class MainWindow(Frame):
         self.frame.bind('<Configure>', self.set_scrollregion)
 
 
-        self.labelframe1=LabelFrame(self.master,background='light green')
+        self.labelframe1=LabelFrame(self.master)
         self.labelframe1.pack(expand="yes", fill=BOTH)
-        title= Label(self.labelframe1,text="Console Log", font=('lato', 18), bd=18, background="light green").pack()
-        vsb1 = Scrollbar(self.labelframe1, orient="vertical",background='light green')
+        title= Label(self.labelframe1,text="Console Log", font=('lato', 18), bd=18).pack()
+        vsb1 = Scrollbar(self.labelframe1, orient="vertical")
 
         self.listbox1 = Listbox(self.labelframe1,yscrollcommand=vsb1.set)
         vsb1.pack(side="right", fill="y")
@@ -77,52 +76,91 @@ class MainWindow(Frame):
     def initUI(self):
         self.master.title("User Mobility Profile")
         self.buildFrames()
-        self.buildMenu()
 
     def about(self):
         showinfo("About","This project was made for the 2020/2021 edition of the Industrial Application course at the University of Pisa.")
         self.master.update()
-    def readFromUMP(self, user_id, field):
-        print("TODO")
-    def writefromUMP(self):
-        print("TODO")
-
-
-
-    def buildMenu(self):
-        menubar = Menu(self.master)
-        self.master.config(menu = menubar)
-
-        options= Menu(menubar)
-        options.add_command(label = "Add user", command = self.addUser)
-        menubar.add_cascade(label = "Options", menu = options)
-
-        filemenu = Menu(menubar)
-        filemenu.add_command(label = "Exit", command = self.onExit)
-        filemenu.add_command(label = "About", command = self.about)
-        menubar.add_cascade(label = "Help", menu = filemenu)
-
 
     def onExit(self):
         self.quit()
+    def readfromUMP(self, value):
+        return value
 
     def openProfile(self, value):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - "+ value)
-        t.geometry("580x560+350+300")
+        t.geometry("760x660+350+300")
 
-        u_frame= LabelFrame(t, background="light green")
+        u_frame= LabelFrame(t)
+        left = Label(u_frame, font=('lato', 18), text="User Profile -" + value, bd=18)
+        left.grid(row=2, column=2)
+        Button(u_frame, text="Edit", font=('lato', 18)).grid (row=2, column=3)
+        Image=Label(u_frame,font=('lato', 18), text=self.readfromUMP('ProfileImage'), bd=18, justify="left" ).grid(row=3, column=2)
+
+        canvas1 = Canvas(u_frame)
+
+        canvas1.grid(row=4, column=1, padx=10)
+        #call procedure to populate canvas
+
+        lbl_name = Label(canvas1,font=('lato', 16),  text="Name: "+self.readfromUMP('Name'), anchor='w',bd=18,justify="left"  )
+        lbl_name.pack()
+
+        lbl_surname = Label(canvas1,font=('lato', 16),text="Surname: "+self.readfromUMP('Surname'), anchor='w',bd=18,justify="left"  )
+        lbl_surname.pack()
+
+        lbl_age=Label(canvas1,font=('lato', 16),  text="Age: "+self.readfromUMP('Age'), anchor='w',bd=18,justify="left"  )
+        lbl_age.pack()
+
+        lbl_gender=Label(canvas1,font=('lato', 16), text="Gender: "+self.readfromUMP('Gender'),anchor='w',bd=18,justify="left"  )
+        lbl_gender.pack()
+
+        lbl_country=Label(canvas1,font=('lato', 16),text="Country: "+self.readfromUMP('Country'), anchor='w',bd=18,justify="left"  )
+        lbl_country.pack()
+
+        canvas2 = Canvas(u_frame)
+        canvas2.grid(row=4, column=2)
+
+        lbl_homeloc=Label(canvas2,font=('lato', 16), text="Home Location: "+self.readfromUMP('home_location'), anchor='w', bd=18,justify="left"  )
+        lbl_homeloc.pack()
+
+        lbl_jobloc=Label(canvas2,font=('lato', 16), text="Job Location: "+self.readfromUMP('job_location'),   anchor='w',bd=18,justify="left"  )
+        lbl_jobloc.pack()
+
+        lbl_lochistory = Label(canvas2,font=('lato', 16), text="Location History: "+self.readfromUMP('Location History'), anchor='w', bd=18,justify="left"  )
+        lbl_lochistory.pack()
+
+        lbl_drivingstyle=Label(canvas2,font=('lato', 16), text="Driving Style: "+self.readfromUMP('driving_style'), anchor='w', bd=18,justify="left"  )
+        lbl_drivingstyle.pack()
+
+        lbl_seatincl=Label(canvas2,font=('lato', 16), text="Seat Inclination: "+self.readfromUMP('seat_inclination'), anchor='w',bd=18,justify="left"  )
+        lbl_seatincl.pack()
+
+        canvas3 = Canvas(u_frame)
+        canvas3.grid(row=4, column=3)
+
+        lbl_seator=Label(canvas3,font=('lato', 16), text="Seat Orientation: "+self.readfromUMP('home_location'), anchor='w',bd=18,justify="left"  )
+        lbl_seator.pack()
+
+        lbl_temp=Label(canvas3,font=('lato', 16), text="Temperature: "+self.readfromUMP('temperature_level'),  anchor='w',bd=18,justify="left"  )
+        lbl_temp.pack()
+
+        lbl_lightlevel=Label(canvas3,font=('lato', 16), text="Location History: "+self.readfromUMP('light_level'), anchor='w',bd=18,justify="left"  )
+        lbl_lightlevel.pack()
+
+        lbl_musicgenres=Label(canvas3,font=('lato', 16), text="Music Genres: "+self.readfromUMP('music_genres'),anchor='w',bd=18,justify="left"  )
+        lbl_musicgenres.pack()
+
+        lbl_musicvolume=Label(canvas3,font=('lato', 16), text="Music Volume: "+self.readfromUMP('music_volume'), anchor='w',bd=18,justify="left"  )
+        lbl_musicvolume.pack()
         u_frame.pack(fill="both", expand="yes")
-        left = Label(u_frame, font=('lato', 18), text="User Profile -"+value, background='light green', bd=18)
+
+
 
         # label with image
-        l_frame= LabelFrame(t, background="light green")
+        l_frame= LabelFrame(t)
         l_frame.pack(fill="both", expand="yes")
 
-
-        left.pack()
-        listbox = Listbox(u_frame).pack(expand="yes", fill=BOTH)
-        right = Label(u_frame, font=('lato', 18), text="Console Log", background='light green', bd=18)
+        right = Label(l_frame, font=('lato', 18), text="Console Log",  bd=18)
         right.pack()
         vsb1 = Scrollbar(l_frame, orient="vertical")
 
@@ -135,105 +173,15 @@ class MainWindow(Frame):
 
         listbox1.pack(expand="yes", fill=BOTH)
 
-        [listbox1.insert(END, elem) for elem in  self.listbox1.get(0, self.listbox1.size() - 1)]
+        [listbox1.insert(END, " "+elem) for elem in  self.listbox1.get(0, self.listbox1.size() - 1)]
 
         #TODO: handle image
 
-
-    def addUser(self):
-        print("TODO")
-        '''
-        t = Toplevel(self)
-        t.wm_title("Registration Form")
-        t.geometry("560x560+350+300")
-
-        lbl_result = Label(t, text=" Registration Form", font=('lato', 18),justify=LEFT)
-        lbl_result.grid(row=3,column=2, columnspan=3)
-
-        lbl_name = Label(t, text="Name:",font=('lato', 18), bd=18 , justify=LEFT)
-        lbl_name.grid(sticky = W,row=4, column=1)
-
-        name = Entry(t, font=('lato', 18), width=10)
-        name.grid(row=4, column=2)
-
-        lbl_surname = Label(t, text="Surname:", font=('lato', 18), bd=18,justify=LEFT)
-        lbl_surname.grid(sticky = W,row=4, column=3)
-
-        surname = Entry(t, font=('lato', 18), width=10)
-        surname.grid(row=4, column=4)
-
-        lbl_gender = Label(t, text="Gender:",font=('lato', 18), bd=18,justify=LEFT)
-        lbl_gender.grid(sticky = W,row=5, column=1)
-
-        var = IntVar()
-
-        rd = Radiobutton(t, text="Male", font=('lato', 18),padx=5, variable=var, value=1)
-        rd.grid(row=5, column=2)
-        rd1 = Radiobutton(t, text="Female", font=('lato', 18),padx=5, variable=var, value=1)
-        rd1.grid(row=5, column=3)
-        rd1 = Radiobutton(t, text="Unspecified", font=('lato', 18), padx=5, variable=var, value=1)
-        rd1.grid(row=5, column=4)
-
-        lbl_age= Label(t, text="Age:",font=('lato', 18), bd=18, justify=LEFT)
-        lbl_age.grid(sticky = W,row=6, column=1)
-        #TODO add integer value
-        lbl_country = Label(t, text="Nationality:", font=('lato', 18), bd=18, justify=LEFT)
-        lbl_country.grid(sticky = W,row=7, column=1)
-
-        list_of_country = ['United States', 'Afghanistan', 'Albania', 'Algeria', 'American Samoa','Andorra', 'Angola','Anguilla', 'Antarctica', 'Antigua And Barbuda','Argentina','Armenia','Aruba', 'Australia', 'Austria','Azerbaijan','Bahamas','Bahrain', 'Bangladesh', 'Barbados', 'Belarus','Belgium','Belize', 'Benin','Bermuda','Bhutan','Bolivia','Bosnia And Herzegowina','Botswana','Bouvet Island', 'Brazil','Brunei Darussalam','Bulgaria','Burkina Faso','Burundi','Cambodia','Cameroon',
-            'Canada', 'Cape Verde', 'Cayman Islands','Central African Rep','Chad', 'Chile','China','Christmas Island','Cocos Islands', 'Colombia', 'Comoros','Congo','Cook Islands', 'Costa Rica', 'Cote D`ivoire', 'Croatia', 'Cuba', 'Cyprus',    'Czech Republic','Denmark', 'Djibouti', 'Dominica','Dominican Republic','East Timor','Ecuador', 'Egypt', 'El Salvador','Equatorial Guinea', 'Eritrea', 'Estonia','Ethiopia','Falkland Islands (Malvinas)', 'Faroe Islands','Fiji', 'Finland','France','French Guiana','French Polynesia', 'French S. Territories', 'Gabon',
-             'Gambia',    'Georgia',    'Germany',    'Ghana',    'Gibraltar',    'Greece',    'Greenland',    'Grenada',    'Guadeloupe',    'Guam',    'Guatemala',    'Guinea',    'Guinea-bissau',    'Guyana',    'Haiti',    'Honduras','Hong Kong','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland',
-             'Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Korea (North)','Korea (South)', 'Kuwait', 'Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg', 'Macau','Macedonia','Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali','Malta', 'Marshall Islands', 'Martinique','Mauritania','Mauritius','Mayotte','Mexico','Micronesia','Moldova','Monaco', 'Mongolia','Montserrat','Morocco', 'Mozambique', 'Myanmar','Namibia',   'Nauru','Nepal','Netherlands','Netherlands Antilles', 'New Caledonia', 'New Zealand','Nicaragua', 'Niger','Nigeria', 'Niue','Norfolk Island', 'Northern Mariana Islands','Norway','Oman','Pakistan', 'Palau', 'Panama','Papua New Guinea','Paraguay', 'Peru','Philippines','Pitcairn','Poland', 'Portugal','Puerto Rico', 'Qatar','Reunion','Romania', 'Russian Federation', 'Rwanda', 'Saint Kitts And Nevis','Saint Lucia','St Vincent/Grenadines', 'Samoa','San Marino', 'Sao Tome','Saudi Arabia', 'Senegal','Seychelles', 'Sierra Leone','Singapore','Slovakia','Slovenia', 'Solomon Islands', 'Somalia', 'South Africa','Spain','Sri Lanka', 'St. Helena','St.Pierre', 'Sudan','Suriname','Swaziland','Sweden','Switzerland','Syrian Arab Republic','Taiwan','Tajikistan','Tanzania', 'Thailand', 'Togo','Tokelau', 'Tonga','Trinidad And Tobago','Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda','Ukraine', 'United Arab Emirates','United Kingdom', 'Uruguay', 'Vanuatu', 'Vatican City State','Venezuela','Viet Nam','Virgin Islands (British)','Virgin Islands (U.S.)''Western Sahara','Yemen','Yugoslavia','Zaire','Zambia','Zimbabwe']
-                # the variable 'c' mentioned here holds String Value, by default ""
-        c = StringVar()
-        droplist = OptionMenu(t, c, *list_of_country)
-        droplist.grid(row=7, column=2, columnspan=2)
-        c.set('Select Country')
-
-        t.mainloop()
-
-
-        #lbl_username = Label(t, text="Name:", bd=18)
-        #lbl_username.grid(row=1, column=1)
-        lbl_password = Label(t, text="Surname:", bd=18)
-        lbl_password.grid(row=2,column=1)
-        var = IntVar()
-        lbl_gender= Label(t, text="Gender", bd=18)
-        lbl_gender.grid(row=8, column=1)
-        rd= Radiobutton(t, text="Male", padx=5, variable=var, value=1)
-        rd.grid(row=8, column=2)
-        rd1 = Radiobutton(t, text="Female", padx=5, variable=var, value=1)
-        rd1.grid(row=8, column=3)
-        lbl_firstname = Label(t, text="Gender:", font=('arial', 18), bd=18)
-        lbl_firstname.grid(row=3,column=1)
-        lbl_lastname = Label(t, text="Address:", font=('arial', 18), bd=18)
-        lbl_lastname.grid(row=4,column=1)
-        lbl_result = Label(t, text=" Registration Form", font=('lato', 18))
-        lbl_result.grid(row=1,column=1, columnspan=4)
-
-
-
-       # user = Entry(t, font=('lato', 20), width=15)
-      #  user.grid(row=1, column=2)
-        pass1 = Entry(t, font=('lato', 20),  width=15, show="*")
-        pass1.grid(row=2, column=2)
-        name = Entry(t, font=('lato', 20), width=15)
-        name.grid(row=3, column=2)
-        address = Entry(t, font=('lato', 20), width=15)
-        address.grid(row=4, column=2)
-
-
-        btn_register = Button(t, font=('lato', 20), text="Register")
-        btn_register.grid(row=6, column=2, columnspan=2)
-
-        # this will run the mainloop.
-        t.mainloop()
-'''
 def main():
 
     root = Tk()
     root.geometry("560x560+300+300")
-    root.configure(background='light green')
+
     app = MainWindow()
     root.mainloop()
 
