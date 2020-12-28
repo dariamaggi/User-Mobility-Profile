@@ -18,6 +18,13 @@ class Test(TestCase):
         user = get_random_user(db)
         self.assertIsNotNone(user, "Error get random user from ump")
 
+    def test_read_all_users(self):
+        db = open_db()
+        users = read_all_users(db)
+        for document in users:
+            print(document)
+        self.assertIsNotNone(users, "Error get all users from ump")
+
     def test_read_field_from_ump(self):
         db = open_db()
         user = get_random_user(db)

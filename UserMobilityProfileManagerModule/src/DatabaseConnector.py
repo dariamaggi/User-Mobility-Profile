@@ -28,6 +28,10 @@ def modify_to_ump(user_id, col, field, value):
                                 {'$set': {field: value}})
 
 
+def read_all_users(col):
+    return col.users.find({})
+
+
 def insert_user(col, value):
     return col.users.insert_one(value)  # Return the ID
 
