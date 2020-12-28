@@ -53,7 +53,7 @@ def get_all_audio():
 def get_image_by_id(user_id):  # Want ObjectId not the string of id
     db = open_db()
     user_photo = read_image_by_id(db, user_id)
-    output = open(str(user_id) + '.jpg', 'wb')
+    output = open(setting + str(user_id) + '.jpg', 'wb')
     output.write(user_photo)
     output.close()
 
@@ -76,14 +76,14 @@ def create_temp_user():
 
 def delete_user_by_id(user_id):  # Want ObjectId not the string of id
     db = open_db()
-    return delete_user(user_id,db)  # Return DeleteResult
+    return delete_user(user_id, db)  # Return DeleteResult
 
 
 def get_user(request_id, data_type, data):
     user = identify_user(data)
     response = []
     if user is 1:
-        #user = request_remote_ump(data)
+        # user = request_remote_ump(data)
         if user is 1:
             user = create_temp_user()
 
