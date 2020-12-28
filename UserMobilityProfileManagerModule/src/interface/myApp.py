@@ -94,7 +94,7 @@ class MainWindow(Frame):
     def readfromUMP(self, value):
         return value
 
-    def openEdit(self):
+    def openEdit(self,name, surname):
         t = Toplevel(self)
         t.wm_title("Edit Profile")
         t.geometry("400x460+350+300")
@@ -124,7 +124,10 @@ class MainWindow(Frame):
         entry_age.insert(0, self.readfromUMP("Age"))
         entry_age.grid(row=row, column=2)
 
-
+        Button(t, text="ubmit",command=lambda nme=name,arg1=name_entry.get():  self.edit(nme,arg1)).pack()
+    def edit(self, name,arg1):
+        name.configure(text=arg1)
+        print(arg1)
     def openProfile(self, value):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - "+ value)
@@ -133,7 +136,6 @@ class MainWindow(Frame):
         u_frame= LabelFrame(t)
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + value, bd=18)
         left.grid(row=2, column=2)
-        Button(u_frame, text="Edit", font=('lato', 18), command=self.openEdit).grid (row=2, column=3)
 
         canvas1 = Canvas(u_frame)
 
@@ -191,6 +193,7 @@ class MainWindow(Frame):
         lbl_musicvolume=Label(canvas3,font=('lato', 16), text="Music Volume: "+self.readfromUMP('music_volume'), anchor='w',bd=18,justify="left"  )
         lbl_musicvolume.pack()
         u_frame.pack(fill="both", expand="yes")
+        Button(u_frame, text="Edit", font=('lato', 18), command=lambda name=lbl_name, surname=lbl_surname : self.openEdit(name, surname)).grid (row=2, column=3)
 
 
 
