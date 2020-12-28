@@ -1,6 +1,22 @@
+import configparser
+import os
+
 from pymongo import MongoClient
 from random import randint
 import gridfs
+
+from pathlib import Path
+
+# prendere dati da config file
+config = configparser.ConfigParser()
+path = Path(__file__).parent.parent
+config.read(os.path.join(path, 'files', 'configurations.ini'))
+# config.read('/files/configurations.ini')
+setting = config['settings']
+
+
+def get_project_root() -> Path:
+    return
 
 
 # TODO:gestisci passaggio di parametri con file di configurazione
@@ -82,8 +98,8 @@ def read_all_images(col):
     try:
         for user in users:
             out = read_image_by_id(col, user)
-            if out is not 1:
-                output = open(str(user) + '.jpg', 'wb')
+            if out != 1:
+                output = open(setting['img_path'] + str(user) + '.jpg', 'wb')
                 output.write(out)
                 output.close()
     except:
@@ -97,7 +113,7 @@ def read_all_audio(col):
     try:
         for user in users:
             out = read_audio_by_id(col, user)
-            if out is not 1:
+            if out != 1:
                 output = open(str(user) + '.mp3', 'wb')
                 output.write(out)
                 output.close()

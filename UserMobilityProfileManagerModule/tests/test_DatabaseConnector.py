@@ -70,13 +70,13 @@ class Test(TestCase):
         result = insert_image(db, sys.argv[2], user['_id'])
         self.assertTrue(result.acknowledged, "Error insert image")
 
-    def test_get_image_by_id(self):
+    def test_read_image_by_id(self):
         db = open_db()
         user = get_random_user(db)
         result = read_image_by_id(db, user['_id'])
         self.assertIsNotNone(result, "Error get image")
 
-    def test_get_all_images(self):
+    def test_read_all_images(self):
         db = open_db()
         result = read_all_images(db)
         self.assertEqual(result, 0, "Error get all image")
@@ -87,13 +87,13 @@ class Test(TestCase):
         result = insert_audio(db, sys.argv[3], user['_id'])
         self.assertTrue(result.acknowledged, "Error insert audio")
 
-    def test_get_audio_by_id(self):
+    def test_read_audio_by_id(self):
         db = open_db()
         user = get_random_user(db)
         result = read_audio_by_id(db, user['_id'])
         self.assertIsNotNone(result, "Error get audio")
 
-    def test_get_all_audio(self):
+    def test_read_all_audio(self):
         db = open_db()
         result = read_all_audio(db)
         self.assertEqual(result, 0, "Error get all audio")
