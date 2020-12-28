@@ -50,7 +50,7 @@ def insert_audio(db, audio, user_id):
     return modify_to_ump(user_id, db, 'audio', audio_id)
 
 
-def get_image_by_id(db, user_id):
+def read_image_by_id(db, user_id):
     fs = gridfs.GridFS(db)
     image_id = read_field_from_ump(user_id, db, 'image')
     if image_id:
@@ -59,14 +59,11 @@ def get_image_by_id(db, user_id):
     return 1
 
 
-def get_audio_by_id(db, user_id):
+def read_audio_by_id(db, user_id):
     fs = gridfs.GridFS(db)
     audio_id = read_field_from_ump(user_id, db, 'audio')
     if audio_id:
-        out = fs.get(audio_id['audio']).read()
-        output = open(str(user_id) + '.mp3', 'wb')
-        output.write(out)
-        output.close()
+        return fs.get(audio_id['audio']).read()
 
     return 1
 
@@ -80,11 +77,11 @@ def insert_file(db, file):
     return stored
 
 
-def get_all_images(col):
+def read_all_images(col):
     users = col.users.find().distinct('_id')
     try:
         for user in users:
-            out = get_image_by_id(col, user)
+            out = read_image_by_id(col, user)
             if out is not 1:
                 output = open(str(user) + '.jpg', 'wb')
                 output.write(out)
@@ -95,11 +92,15 @@ def get_all_images(col):
     return 0
 
 
-def get_all_audio(col):
+def read_all_audio(col):
     users = col.users.find().distinct('_id')
     try:
         for user in users:
-            get_audio_by_id(col, user)
+            out = read_audio_by_id(col, user)
+            if out is not 1:
+                output = open(str(user) + '.mp3', 'wb')
+                output.write(out)
+                output.close()
     except:
         return 1
 
