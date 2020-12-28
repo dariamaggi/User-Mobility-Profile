@@ -54,10 +54,7 @@ def get_image_by_id(db, user_id):
     fs = gridfs.GridFS(db)
     image_id = read_field_from_ump(user_id, db, 'image')
     if image_id:
-        out = fs.get(image_id['image']).read()
-        output = open(str(user_id) + '.jpg', 'wb')
-        output.write(out)
-        output.close()
+        return fs.get(image_id['image']).read()
 
     return 1
 
@@ -87,7 +84,11 @@ def get_all_images(col):
     users = col.users.find().distinct('_id')
     try:
         for user in users:
-            get_image_by_id(col, user)
+            out = get_image_by_id(col, user)
+            if out is not 1:
+                output = open(str(user) + '.jpg', 'wb')
+                output.write(out)
+                output.close()
     except:
         return 1
 

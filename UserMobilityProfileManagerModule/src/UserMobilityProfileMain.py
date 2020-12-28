@@ -34,6 +34,11 @@ def modify_fields_user(user_id, field, value):
     return modify_to_ump(user_id, db, field, value)
 
 
+def get_all_image():
+    db = open_db()
+    return get_all_images(db)
+
+
 # TODO: da definire con Marsha e Andrea
 def insert_user(user):
     create_user(user)
