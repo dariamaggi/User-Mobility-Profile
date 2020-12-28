@@ -1,5 +1,7 @@
+import os
 from tkinter import *
 from PIL import ImageTk, Image
+from PIL import Image as PImage
 import datetime
 from tkinter.messagebox import showinfo
 from json import loads
@@ -24,26 +26,32 @@ class MainWindow(Frame):
         self.listbox1.insert(END, str(datetime.datetime.now())+": opened profile: "+ method)
         self.openProfile(method)
 
+    def loadImages(self,path):
+        # return array of images
+
+        imagesList = os.listdir(path)
+        loadedImages = []
+        for image in imagesList:
+            img = PImage.open(path + image)
+            loadedImages.append(img)
+
     def set_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
     def buildFrames(self):
         left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18)
         left.pack()
-
         self.canvas = Canvas(self.master)
         self.canvas.pack(side=TOP, expand=TRUE)
 
         i=1
-        for method in ["Lucas", "John", "Bob"]:
-            button = Button(self.canvas, text=method,
-                            command=lambda m=method: self.populateMethod(m),font=('lato', 18), bd=18)
-            button.grid(row=0,column=i)
-            i+=1
-            if i%3==0:
-                i=0
-                button = Button(self.canvas, text=method,
-                                command=lambda m=method: self.populateMethod(m), font=('lato', 18), bd=18)
-                button.grid(row=1, column=i)
+
+        for method in ["id_0", "id_1"]:
+           # button = Button(self.canvas, text=method,image=img,command=lambda m=method: self.populateMethod(m),font=('lato', 18), bd=18)
+           button = Button(self.canvas, text=method,  command=lambda m=method: self.populateMethod(m),
+                           font=('lato', 18), bd=18)
+           button.grid(row=0,column=i)
+           i+=1
+
 
 
         self.frame = Frame(self.canvas)
@@ -53,7 +61,7 @@ class MainWindow(Frame):
 
         self.labelframe1=LabelFrame(self.master)
         self.labelframe1.pack(expand="yes", fill=BOTH)
-        title= Label(self.labelframe1,text="Console Log", font=('lato', 18), bd=18).pack()
+        title= Label(self.labelframe1,text="Console Log", font=('lato', 18),bg="white", bd=18).pack()
         vsb1 = Scrollbar(self.labelframe1, orient="vertical")
 
         self.listbox1 = Listbox(self.labelframe1,yscrollcommand=vsb1.set)
@@ -86,6 +94,37 @@ class MainWindow(Frame):
     def readfromUMP(self, value):
         return value
 
+    def openEdit(self):
+        t = Toplevel(self)
+        t.wm_title("Edit Profile")
+        t.geometry("400x460+350+300")
+        Label(t, font=('lato', 20), text="Edit profile", bd=18, justify="left").pack()
+
+        u_frame=Frame(t)
+        u_frame.pack()
+
+        row=2
+
+        name_lab= Label(u_frame, font=('lato', 16), text="Name :", anchor='w', bd=18, justify="left")
+        name_lab.grid(row=row, column=1)
+
+        name_entry=Entry(u_frame)
+        name_entry.insert(0, self.readfromUMP("Name"))
+        name_entry.grid(row=row, column=2)
+
+        row+=1
+        lbl_surname=Label(u_frame, font=('lato', 16), text="Surname :", anchor='w', bd=18, justify="left").grid(row=row, column=1)
+        entry_surname = Entry(u_frame)
+        entry_surname.insert(0, self.readfromUMP("Surname"))
+        entry_surname.grid(row=row, column=2)
+
+        row+=1
+        Label(u_frame, font=('lato', 16), text="Age :", anchor='w', bd=18, justify="left").grid(row=row, column=1)
+        entry_age = Entry(u_frame)
+        entry_age.insert(0, self.readfromUMP("Age"))
+        entry_age.grid(row=row, column=2)
+
+
     def openProfile(self, value):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - "+ value)
@@ -94,8 +133,7 @@ class MainWindow(Frame):
         u_frame= LabelFrame(t)
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + value, bd=18)
         left.grid(row=2, column=2)
-        Button(u_frame, text="Edit", font=('lato', 18)).grid (row=2, column=3)
-        Image=Label(u_frame,font=('lato', 18), text=self.readfromUMP('ProfileImage'), bd=18, justify="left" ).grid(row=3, column=2)
+        Button(u_frame, text="Edit", font=('lato', 18), command=self.openEdit).grid (row=2, column=3)
 
         canvas1 = Canvas(u_frame)
 
