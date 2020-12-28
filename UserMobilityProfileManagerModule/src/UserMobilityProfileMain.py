@@ -1,5 +1,5 @@
 from bson import ObjectId
-from interface.config_file import *
+from config_file import *
 from UserIdentificationLogic import *
 
 from DatabaseConnector import *
