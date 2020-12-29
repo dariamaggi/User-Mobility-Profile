@@ -21,7 +21,7 @@ def get_project_root() -> Path:
 # TODO:gestisci passaggio di parametri con file di configurazione
 
 def rundb():
-    _client = MongoClient('mongodb://127.0.0.1:27017')
+    _client = MongoClient(setting['mongo_con'])
     db = _client.UserProfileManagerDB
 
 
@@ -150,7 +150,7 @@ def create_user_json(user):  # Use it only for test
 
 
 def populate_db():
-    client = MongoClient('mongodb://127.0.0.1:27017')  # Open DB
+    client = MongoClient(setting['mongo_con'])  # Open DB
     db = client.UserProfileManagerDB  # Define DB
 
     mycol = db["users"]  # Get collection

@@ -1,17 +1,17 @@
 from bson import ObjectId
-from config_file import *
 from UserIdentificationLogic import *
 
 from DatabaseConnector import *
 
 # prendere dati da config file
 config = configparser.ConfigParser()
-config.read('configurations.ini')
+path = Path(__file__).parent.parent
+config.read(os.path.join(path, 'files', 'configurations.ini'))
 setting = config['settings']
 
 
 def open_db():
-    client = MongoClient('mongodb://127.0.0.1:27017')
+    client = MongoClient(setting['mongo_con'])
     return client.UserProfileManagerDB
 
 
