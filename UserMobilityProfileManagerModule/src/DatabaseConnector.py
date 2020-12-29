@@ -98,7 +98,7 @@ def read_all_images(col):
         for user in users:
             out = read_image_by_id(col, user)
             if out != 1:
-                output = open(os.path.join(setting['img_path'], str(user) + '.jpg'), 'wb')
+                output = open(os.path.join(setting['img_path'], str(user) + '.png'), 'wb')
                 output.write(out)
                 output.close()
     except:
@@ -113,7 +113,7 @@ def read_all_audio(col):
         for user in users:
             out = read_audio_by_id(col, user)
             if out != 1:
-                output = open(str(user) + '.mp3', 'wb')
+                output = open(os.path.join(setting['sound_path'], str(user) + '.mp3'), 'wb')
                 output.write(out)
                 output.close()
     except:
