@@ -11,7 +11,6 @@ from pathlib import Path
 config = configparser.ConfigParser()
 path = Path(__file__).parent.parent
 config.read(os.path.join(path, 'files', 'configurations.ini'))
-# config.read('/files/configurations.ini')
 setting = config['settings']
 
 
@@ -99,7 +98,7 @@ def read_all_images(col):
         for user in users:
             out = read_image_by_id(col, user)
             if out != 1:
-                output = open(setting['img_path'] + str(user) + '.jpg', 'wb')
+                output = open(os.path.join(setting['img_path'], str(user) + '.jpg'), 'wb')
                 output.write(out)
                 output.close()
     except:
