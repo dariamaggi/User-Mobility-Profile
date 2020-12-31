@@ -140,9 +140,9 @@ def read_all_images(col):
                     output.close()
                     counter = counter + 1
     except:
-        return 1
+        return False
 
-    return 0
+    return True
 
 
 def read_all_audios(col):
@@ -158,9 +158,9 @@ def read_all_audios(col):
                     output.close()
                     counter = counter + 1
     except:
-        return 1
+        return False
 
-    return 0
+    return True
 
 
 def create_user(db, user):

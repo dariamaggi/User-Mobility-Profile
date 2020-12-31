@@ -15,16 +15,19 @@ def open_db():
     return client.UserProfileManagerDB
 
 
-def get_user(user_id):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+def get_user(user_id):
     db = open_db()
     return read_all_from_ump(ObjectId(user_id), db)
 
 
-def get_field_of_user(user_id, field):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+def get_field_of_user(user_id, field):
     db = open_db()
     return read_field_from_ump(ObjectId(user_id), db, field)
 
 
+# Return Collection of users
 def get_all_users():
     db = open_db()
     users = []
@@ -35,22 +38,30 @@ def get_all_users():
     return users
 
 
-def modify_fields_user(user_id, field, value):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+def modify_fields_user(user_id, field, value):
     db = open_db()
     return modify_to_ump(user_id, db, field, value)
 
 
+# Write all images on files/photos and return True False
+# The Images format are user_id + _ + counter(incremental) + .png
 def get_all_image():
     db = open_db()
     return read_all_images(db)
 
 
+# Write all sounds on files/sounds and return True False
+# The Sounds format are user_id + _ + counter(incremental) + .mp3
 def get_all_audio():
     db = open_db()
     return read_all_audios(db)
 
 
-def get_images_by_id(user_id):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+# Write all images on files/sounds and return True False
+# The Images format are user_id + _ + counter(incremental) + .png
+def get_images_by_id(user_id):
     db = open_db()
     counter = 0
     user_photos = read_images_by_id(db, user_id)
@@ -66,7 +77,10 @@ def get_images_by_id(user_id):  # Want ObjectId not the string of id
     return True
 
 
-def get_image_by_id(user_id):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+# Write one image on files/sounds and return True False
+# The Images format are user_id + .png
+def get_image_by_id(user_id):
     db = open_db()
     user_photo = read_one_image_of_user(db, user_id)
     output = open(os.path.join(setting['img_path'], str(user_id) + '.png'), 'wb')
@@ -76,7 +90,10 @@ def get_image_by_id(user_id):  # Want ObjectId not the string of id
     return True
 
 
-def get_audios_by_id(user_id):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+# Write all images on files/sounds and return True False
+# The Images format are user_id + _ + counter(incremental) + .mp3
+def get_audios_by_id(user_id):
     db = open_db()
     counter = 0
     user_audios = read_audios_by_id(db, user_id)
@@ -92,7 +109,10 @@ def get_audios_by_id(user_id):  # Want ObjectId not the string of id
     return True
 
 
-def get_audio_by_id(user_id):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+# Write one audio on files/sounds and return True False
+# The audio format is user_id + .mp3
+def get_audio_by_id(user_id):
     db = open_db()
     user_audio = read_one_song_of_user(db, user_id)
     output = open(os.path.join(setting['sound_path'], str(user_id) + '.mp3'), 'wb')
@@ -100,6 +120,7 @@ def get_audio_by_id(user_id):  # Want ObjectId not the string of id
     output.close()
 
 
+# Return a temp user and insert a temp user on db
 def create_temp_user():
     db = open_db()
     list_fields = ['default', 'default', 'default', 43, 'default', 'default', 'default', 'default', 32,
@@ -108,9 +129,11 @@ def create_temp_user():
     return create_user(db, user)
 
 
-def delete_user_by_id(user_id):  # Want ObjectId not the string of id
+# Want ObjectId not the string of id
+# Return DeleteResult
+def delete_user_by_id(user_id):
     db = open_db()
-    return delete_user(user_id, db)  # Return DeleteResult
+    return delete_user(user_id, db)
 
 
 def get_user_temp_non_usare(request_id, data_type, data):
