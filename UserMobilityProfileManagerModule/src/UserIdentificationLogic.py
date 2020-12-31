@@ -22,11 +22,10 @@ setting = config['settings']
 def identify_user(data, flag, db):
     if flag == 1:
         logging.info('Start to elaborate a mp3 file')
-        mp3_files = []
         temp_res = []
-        if mp3_files is None:
+        if data is None:
             logging.error('No file mp3')
-            return False
+            return None
 
         mp3_files = get_all_mp3(db)
         for song in mp3_files:

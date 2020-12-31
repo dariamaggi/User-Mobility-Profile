@@ -1,5 +1,8 @@
 from bson import ObjectId
+
+from CommandLayer import requestRemoteUMP
 from UserIdentificationLogic import *
+import logging
 
 from DatabaseConnector import *
 
@@ -136,18 +139,46 @@ def delete_user_by_id(user_id):
     return delete_user(user_id, db)
 
 
-def get_user_temp_non_usare(request_id, data_type, data):
-    user = identify_user(data)
+# request_id -> numero di richiesta(deve essere incrementale)
+# data_type -> deve essere song o photo
+# data -> foto o suono serializzato
+def recognize_user(request_id, data_type, data):
+    db = open_db()
+    if data_type is 'song':
+        data_path = os.path.join(setting['temp_path'], 'temp' + '.mp3')
+        flag = 1
+    elif data_type is 'photo':
+        data_path = os.path.join(setting['temp_path'], 'temp' + '.png')
+        flag = 0
+    else:
+        return False
+    output = open(data_path, 'wb')
+    output.write(data)
+    output.close()
+    user = identify_user(data_path, flag, db)
+
     response = []
-    if user is 1:
-        # user = request_remote_ump(data)
-        if user is 1:
+    if user is None:
+        logging.info('User is not identified on local')
+        # todo: fai richiesta al cloud
+        user = request_user_cloud(request_id, data_type, data)
+        if user is None:
+            logging.info('User is not identified on cloud, create temp user')
             user = create_temp_user()
 
-    response.insert(data['request_id'], user['_id'])
+    response.insert(request_id, user)
+
+    os.remove(data_path)  # pulisce
     return response
+
+
+def request_user_cloud(request_id, data_type, data):
+    return requestRemoteUMP(request_id, data_type, data)
 
 
 # TODO: da definire con Marsha e Andrea
 def insert_user(user):
-    create_user(user)
+    db = open_db()
+    create_user(db, user)
+
+    return True
