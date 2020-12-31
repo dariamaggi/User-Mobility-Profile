@@ -160,7 +160,7 @@ def recognize_user(request_id, data_type, data):
     response = []
     if user is None:
         logging.info('User is not identified on local')
-        # todo: fai richiesta al cloud
+        # todo: ricorda di cambiare questa cosa sul server
         user = request_user_cloud(request_id, data_type, data)
         if user is None:
             logging.info('User is not identified on cloud, create temp user')
