@@ -73,7 +73,7 @@ class Test(TestCase):
     def test_read_image_by_id(self):
         db = open_db()
         user = get_random_user(db)
-        result = read_image_by_id(db, user['_id'])
+        result = read_images_by_id(db, user['_id'])
         self.assertIsNotNone(result, "Error get image")
 
     def test_read_all_images(self):
@@ -90,10 +90,16 @@ class Test(TestCase):
     def test_read_audio_by_id(self):
         db = open_db()
         user = get_random_user(db)
-        result = read_audio_by_id(db, user['_id'])
+        result = read_audios_by_id(db, user['_id'])
         self.assertIsNotNone(result, "Error get audio")
 
     def test_read_all_audio(self):
         db = open_db()
-        result = read_all_audio(db)
+        result = read_all_audios(db)
         self.assertEqual(result, 0, "Error get all audio")
+
+    def test_read_one_image_of_user(self):
+        db = open_db()
+        user = get_random_user(db)
+        result = read_one_image_of_user(db, user['_id'])
+        self.assertIsNotNone(result, 'Error to get one image')

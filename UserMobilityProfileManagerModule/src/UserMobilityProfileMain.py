@@ -47,21 +47,55 @@ def get_all_image():
 
 def get_all_audio():
     db = open_db()
-    return read_all_audio(db)
+    return read_all_audios(db)
+
+
+def get_images_by_id(user_id):  # Want ObjectId not the string of id
+    db = open_db()
+    counter = 0
+    user_photos = read_images_by_id(db, user_id)
+    if user_photos is None:
+        return False
+    for photo in user_photos:
+        if photo is not None:
+            output = open(os.path.join(setting['img_path'], str(user_id) + '_' + counter + '.png'), 'wb')
+            output.write(photo)
+            output.close()
+            counter = counter + 1
+
+    return True
 
 
 def get_image_by_id(user_id):  # Want ObjectId not the string of id
     db = open_db()
-    user_photo = read_image_by_id(db, user_id)
-    output = open(setting + str(user_id) + '.jpg', 'wb')
-    output.write(user_photo)
+    user_photo = read_one_image_of_user(db, user_id)
+    output = open(os.path.join(setting['img_path'], str(user_id) + '.png'), 'wb')
+    output.write(user_photo[0])
     output.close()
+
+    return True
+
+
+def get_audios_by_id(user_id):  # Want ObjectId not the string of id
+    db = open_db()
+    counter = 0
+    user_audios = read_audios_by_id(db, user_id)
+    if user_audios is None:
+        return False
+    for audio in user_audios:
+        if audio is not None:
+            output = open(os.path.join(setting['sound_path'], str(user_id) + '_' + counter + '.mp3'), 'wb')
+            output.write(audio)
+            output.close()
+            counter = counter + 1
+
+    return True
 
 
 def get_audio_by_id(user_id):  # Want ObjectId not the string of id
     db = open_db()
-    user_audio = read_audio_by_id(db, user_id)
-    output = open(str(user_id) + '.mp3', 'wb')
+    user_audio = read_one_song_of_user(db, user_id)
+    output = open(os.path.join(setting['sound_path'], str(user_id) + '.mp3'), 'wb')
     output.write(user_audio)
     output.close()
 
@@ -79,7 +113,7 @@ def delete_user_by_id(user_id):  # Want ObjectId not the string of id
     return delete_user(user_id, db)  # Return DeleteResult
 
 
-def get_user(request_id, data_type, data):
+def get_user_temp_non_usare(request_id, data_type, data):
     user = identify_user(data)
     response = []
     if user is 1:

@@ -39,6 +39,10 @@ def read_all_from_ump(user_id, col):
 
 
 def modify_to_ump(user_id, col, field, value):
+    if field is 'image' or field is 'sound':
+        return col.users.update_one({'_id': user_id},
+                                    {'$push': {field: value}})
+
     return col.users.update_one({'_id': user_id},
                                 {'$set': {field: value}})
 
@@ -65,21 +69,29 @@ def insert_audio(db, audio, user_id):
     return modify_to_ump(user_id, db, 'audio', audio_id)
 
 
-def read_image_by_id(db, user_id):
+def read_images_by_id(db, user_id):
+    images = []
     fs = gridfs.GridFS(db)
     image_id = read_field_from_ump(user_id, db, 'image')
-    if image_id:
-        return fs.get(image_id['image']).read()
+    if image_id is None:
+        return 1
+    for image in image_id['image']:
+        images.append(fs.get(image).read())
 
+    return images
     return 1
 
 
-def read_audio_by_id(db, user_id):
+def read_audios_by_id(db, user_id):
+    audios = []
     fs = gridfs.GridFS(db)
     audio_id = read_field_from_ump(user_id, db, 'audio')
-    if audio_id:
-        return fs.get(audio_id['audio']).read()
+    if audio_id is None:
+        return 1
+    for audio in audio_id['audio']:
+        audios.append(fs.get(audio).read())
 
+    return audios
     return 1
 
 
@@ -92,30 +104,59 @@ def insert_file(db, file):
     return stored
 
 
+def read_one_image_of_user(col, user_id):
+    try:
+        images = read_images_by_id(col, user_id)
+        if images is not None:
+            return images[0]
+
+        else:
+            return None
+    except:
+        return None
+
+
+def read_one_song_of_user(col, user_id):
+    try:
+        sounds = read_audios_by_id(col, user_id)
+        if sounds is not None:
+            return sounds[0]
+        else:
+            return None
+    except:
+        return None
+
+
 def read_all_images(col):
     users = col.users.find().distinct('_id')
+    counter = 0
     try:
         for user in users:
-            out = read_image_by_id(col, user)
-            if out != 1:
-                output = open(os.path.join(setting['img_path'], str(user) + '.png'), 'wb')
-                output.write(out)
-                output.close()
+            images = read_images_by_id(col, user)
+            for image in images:
+                if image != 1:
+                    output = open(os.path.join(setting['img_path'], str(user) + '_' + counter + '.png'), 'wb')
+                    output.write(image)
+                    output.close()
+                    counter = counter + 1
     except:
         return 1
 
     return 0
 
 
-def read_all_audio(col):
+def read_all_audios(col):
     users = col.users.find().distinct('_id')
+    counter = 0
     try:
         for user in users:
-            out = read_audio_by_id(col, user)
-            if out != 1:
-                output = open(os.path.join(setting['sound_path'], str(user) + '.mp3'), 'wb')
-                output.write(out)
-                output.close()
+            audios = read_audios_by_id(col, user)
+            for audio in audios:
+                if audio != 1:
+                    output = open(os.path.join(setting['sound_path'], str(user) + '_' + counter + '.mp3'), 'wb')
+                    output.write(audio)
+                    output.close()
+                    counter = counter + 1
     except:
         return 1
 

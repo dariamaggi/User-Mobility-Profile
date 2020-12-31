@@ -2,7 +2,7 @@ from UserIdentificationLogic import *
 from DatabaseConnector import *
 import configparser
 import logging
-from DatabaseConnector import read_all_audio
+from DatabaseConnector import read_all_audios
 from os import listdir
 from os.path import isfile, join
 
@@ -61,7 +61,7 @@ def get_best_result(results):
 
 
 def get_all_mp3(db):
-    if read_all_audio(db) == 1:
+    if read_all_audios(db) == 1:
         logging.error('error to extract mp3 files')
         return
 
