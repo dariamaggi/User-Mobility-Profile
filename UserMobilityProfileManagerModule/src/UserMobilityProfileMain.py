@@ -1,5 +1,4 @@
 from bson import ObjectId
-
 from CommandLayer import requestRemoteUMP
 from UserIdentificationLogic import *
 import logging
