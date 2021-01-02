@@ -3,7 +3,7 @@ import configparser
 config = configparser.ConfigParser()
 config['settings'] = {
     'img_path': 'files/photos',
-    'mongo_con': 'localhost'}
+    'mongo_con': 'localhost',
     'img_path': 'files/photos', 
     'vehicle_url': 'localhost',
     'cloud_url': 'localhost',

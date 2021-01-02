@@ -1,5 +1,8 @@
 import socket
 import logging
+import configparser
+from pathlib import Path
+import os
 import threading
 import time
 import traceback
@@ -7,7 +10,6 @@ import json
 
 from UserMobilityProfileMain import recognize_user, modify_fields_user, recognize_user_server
 
-MTU = 1024
 
 # prendere dati da config file
 config = configparser.ConfigParser()
@@ -15,6 +17,11 @@ path = Path(__file__).parent.parent
 # config.read('/files/configurations.ini')
 config.read(os.path.join(path, 'files', 'configurations.ini'))
 setting = config['settings']
+
+
+MTU = 1024
+
+
 class Server:
     def __init__(self, port, type, accept_function):
         logging.basicConfig(level=logging.INFO)
@@ -62,7 +69,7 @@ def server_vehicle_accept(server_socket):
         clientsocket = "" 
         address = ""
         try: 
-            (clientsocket, address) = serversocket.accept()
+            (clientsocket, address) = server_socket.accept()
         except (Exception):
             traceback.print_exc() 
             logging.info("Vehicle - T_accept : failing in accepting the connection")
