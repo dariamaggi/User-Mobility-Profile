@@ -153,7 +153,7 @@ def read_all_audios(col):
             audios = read_audios_by_id(col, user)
             for audio in audios:
                 if audio != 1:
-                    output = open(os.path.join(setting['sound_path'], str(user) + '_' + counter + '.mp3'), 'wb')
+                    output = open(os.path.join(setting['sound_path'], str(user) + '_' + counter + '.wav'), 'wb')
                     output.write(audio)
                     output.close()
                     counter = counter + 1

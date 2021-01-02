@@ -21,13 +21,13 @@ setting = config['settings']
 
 def identify_user(data, flag, db):
     if flag == 1:
-        logging.info('Start to elaborate a mp3 file')
+        logging.info('Start to elaborate a wav file')
         temp_res = []
         if data is None:
-            logging.error('No file mp3')
+            logging.error('No file wav')
             return None
 
-        mp3_files = get_all_mp3(db)
+        mp3_files = get_all_audios(db)
         for song in mp3_files:
             res = match_audio(data, song)
             if res != 0:
@@ -59,9 +59,9 @@ def get_best_result(results):
     return best_song
 
 
-def get_all_mp3(db):
+def get_all_audios(db):
     if read_all_audios(db) == 1:
-        logging.error('error to extract mp3 files')
+        logging.error('error to extract wav files')
         return
 
     only_files = [f for f in listdir(setting['sound_path']) if isfile(join(setting['sound_path'], f))]

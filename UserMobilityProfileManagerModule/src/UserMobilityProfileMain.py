@@ -103,7 +103,7 @@ def get_audios_by_id(user_id):
         return False
     for audio in user_audios:
         if audio is not None:
-            output = open(os.path.join(setting['sound_path'], str(user_id) + '_' + counter + '.mp3'), 'wb')
+            output = open(os.path.join(setting['sound_path'], str(user_id) + '_' + counter + '.wav'), 'wb')
             output.write(audio)
             output.close()
             counter = counter + 1
@@ -117,7 +117,7 @@ def get_audios_by_id(user_id):
 def get_audio_by_id(user_id):
     db = open_db()
     user_audio = read_one_song_of_user(db, user_id)
-    output = open(os.path.join(setting['sound_path'], str(user_id) + '.mp3'), 'wb')
+    output = open(os.path.join(setting['sound_path'], str(user_id) + '.wav'), 'wb')
     output.write(user_audio)
     output.close()
 
@@ -144,7 +144,7 @@ def delete_user_by_id(user_id):
 def recognize_user(request_id, data_type, data):
     db = open_db()
     if data_type is 'song':
-        data_path = os.path.join(setting['temp_path'], 'temp' + '.mp3')
+        data_path = os.path.join(setting['temp_path'], 'temp' + '.wav')
         flag = 1
     elif data_type is 'photo':
         data_path = os.path.join(setting['temp_path'], 'temp' + '.png')
