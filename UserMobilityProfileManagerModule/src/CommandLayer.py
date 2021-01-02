@@ -9,7 +9,12 @@ from UserMobilityProfileMain import recognize_user, modify_fields_user, recogniz
 
 MTU = 1024
 
-
+# prendere dati da config file
+config = configparser.ConfigParser()
+path = Path(__file__).parent.parent
+# config.read('/files/configurations.ini')
+config.read(os.path.join(path, 'files', 'configurations.ini'))
+setting = config['settings']
 class Server:
     def __init__(self, port, type, accept_function):
         logging.basicConfig(level=logging.INFO)
@@ -47,17 +52,19 @@ def recv(socket):
 
 # +++++++++++++++++++++       logica di comunicazione sensore - veicolo +++++++++++++++++++++++++++
 
-VEHICLE_IN_PORT = 65432
+VEHICLE_IN_PORT =   65432 
 VEHICLE_URL = '192.168.1.211'
 
 
 def server_vehicle_accept(server_socket):
     while True:
-        logging.info("Vehicle - T_accept : thread waiting connections")
-        try:
-            (client_socket, address) = server_socket.accept()
-        except Exception:
-            traceback.print_exc()
+        logging.info("Vehicle - T_accept : thread waiting connections" ) 
+        clientsocket = "" 
+        address = ""
+        try: 
+            (clientsocket, address) = serversocket.accept()
+        except (Exception):
+            traceback.print_exc() 
             logging.info("Vehicle - T_accept : failing in accepting the connection")
             continue
 
@@ -92,7 +99,7 @@ def server_vehicle_recv(sensor_socket):
     logging.info("Vehicle - T_recv : data successfully parsed")
 
     # bind con la parte di federico
-    response = recognize_user(request_id, data_type, data)
+    # user_id = identify_user(request_id, data_type, data)
 
     request_id = response[0]
     user_id = response[1]
@@ -143,6 +150,30 @@ def server_vehicle_recv(sensor_socket):
 #     return user_id
 
 
+    # invio i dati
+    s.sendall( json.dumps( payload).encode('utf-8') )
+
+    logging.info("Sensor : request for userID sended")
+    
+    buffer = recv( s )
+    s.close()
+    logging.info("Sensor : Response received, socket closed")
+    
+    request_id = ""
+    user_id = ""
+    try:
+       request_id = buffer["requestID"]
+       user_id = buffer["userID"]
+    except(Exception):
+        logging.info("Sensor  : failed in parsing the data")
+        return False
+    
+    if request_id != requestID:
+        logging.info("Sensor  : The request identificator doasn't correspond")
+        return False
+
+    return user_id
+
 # f chiamata dal veicolo per rispondere alla richiesta del sensore
 def return_user_identifier(request_id, user_id, sensor_socket):
     payload = {'requestID': request_id, 'userID': user_id}
@@ -156,6 +187,7 @@ def return_user_identifier(request_id, user_id, sensor_socket):
 vehicle_server = Server(VEHICLE_IN_PORT, "Vehicle - Main", server_vehicle_accept)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 
 # ++++++++++++++++++++++++++++++++ Logica di comunicazione veicolo - cloud ++++++++++++++++++++++++++
@@ -232,9 +264,9 @@ def request_remote_ump(inquiry_id, data_type, data):
     try:
         inquiry_id = buffer["inquiryID"]
         ump = buffer["UMP"]
-    except Exception:
+    except(Exception):
         logging.info("Cloud  : failed in parsing the data")
-        return None
+        return False
 
     if inquiry_id != inquiry_id:
         logging.info("Cloud  : The request identificator doesn't correspond")
