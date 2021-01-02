@@ -4,9 +4,16 @@ import pathlib
 # import picamera
 import socket
 # from picamera import PiCamera
+import socket  # Import socket module
+import logging
+import time
+import pathlib
+import traceback
+import json
 
-from CommandLayer import request_remote_ump
-
+VEHICLE_IN_PORT = 65432
+VEHICLE_URL = '192.168.1.211'
+MTU = 1024
 
 # CATTURA FOTO E SALVATAGGIO IN PNG  E INVIO SU SOCKET DEL PNG
 
