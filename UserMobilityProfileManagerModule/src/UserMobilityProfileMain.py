@@ -1,5 +1,5 @@
 from bson import ObjectId
-from CommandLayer import requestRemoteUMP
+from CommandLayer import request_remote_ump
 from UserIdentificationLogic import *
 import logging
 
@@ -43,7 +43,10 @@ def get_all_users():
 # Want ObjectId not the string of id
 def modify_fields_user(user_id, field, value):
     db = open_db()
-    return modify_to_ump(user_id, db, field, value)
+    result = modify_to_ump(user_id, db, field, value)
+    if result.acknowledged is True:
+        return modify_user_in_cloud(user_id, field, value)
+    return result
 
 
 # Write all images on files/photos and return True False
@@ -164,15 +167,48 @@ def recognize_user(request_id, data_type, data):
         if user is None:
             logging.info('User is not identified on cloud, create temp user')
             user = create_temp_user()
+        else:
+            create_user(db, user)
 
-    response.insert(request_id, user)
+    response.insert(request_id)
+    response.insert(user)
 
     os.remove(data_path)  # pulisce
     return response
 
 
+def recognize_user_server(request_id, data_type, data):
+    db = open_db()
+    if data_type is 'song':
+        data_path = os.path.join(setting['temp_path'], 'temp' + '.wav')
+        flag = 1
+    elif data_type is 'photo':
+        data_path = os.path.join(setting['temp_path'], 'temp' + '.png')
+        flag = 0
+    else:
+        return False
+    output = open(data_path, 'wb')
+    output.write(data)
+    output.close()
+    user = identify_user(data_path, flag, db)
+
+    response = []
+    if user is None:
+        logging.info('User is not identified on server')
+
+    response.insert(request_id)
+    response.insert(None)
+
+    os.remove(data_path)  # pulisce
+    return response
+
+
+def modify_user_in_cloud(user_id, field, value):
+    return request_remote_ump(1, 'modify', {'_id': user_id, 'field': field, 'value': value})
+
+
 def request_user_cloud(request_id, data_type, data):
-    return requestRemoteUMP(request_id, data_type, data)
+    return request_remote_ump(request_id, data_type, data)
 
 
 # TODO: da definire con Marsha e Andrea
