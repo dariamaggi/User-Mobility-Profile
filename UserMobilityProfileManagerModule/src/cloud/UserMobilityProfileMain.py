@@ -44,8 +44,6 @@ def get_all_users():
 def modify_fields_user(user_id, field, value):
     db = open_db()
     result = modify_to_ump(user_id, db, field, value)
-    if result.acknowledged is True:
-        return modify_user_in_cloud(user_id, field, value)
     return result
 
 
@@ -201,10 +199,6 @@ def recognize_user_server(request_id, data_type, data):
 
     os.remove(data_path)  # pulisce
     return response
-
-
-def modify_user_in_cloud(user_id, field, value):
-    return request_remote_ump(1, 'modify', {'_id': user_id, 'field': field, 'value': value})
 
 
 def request_user_cloud(request_id, data_type, data):

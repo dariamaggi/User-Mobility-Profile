@@ -1,6 +1,6 @@
 from bson import ObjectId
-from CommandLayer import request_remote_ump
 from UserIdentificationLogic import *
+from CommandLayer import request_remote_ump
 import logging
 
 from DatabaseConnector import *
