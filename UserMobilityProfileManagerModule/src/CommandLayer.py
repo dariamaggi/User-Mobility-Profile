@@ -10,14 +10,12 @@ import json
 
 from UserMobilityProfileMain import recognize_user, modify_fields_user, recognize_user_server
 
-
 # prendere dati da config file
 config = configparser.ConfigParser()
 path = Path(__file__).parent.parent
 # config.read('/files/configurations.ini')
 config.read(os.path.join(path, 'files', 'configurations.ini'))
 setting = config['settings']
-
 
 MTU = 1024
 
@@ -59,19 +57,19 @@ def recv(socket):
 
 # +++++++++++++++++++++       logica di comunicazione sensore - veicolo +++++++++++++++++++++++++++
 
-VEHICLE_IN_PORT =   65432 
+VEHICLE_IN_PORT = 65432
 VEHICLE_URL = '192.168.1.211'
 
 
 def server_vehicle_accept(server_socket):
     while True:
-        logging.info("Vehicle - T_accept : thread waiting connections" ) 
-        clientsocket = "" 
+        logging.info("Vehicle - T_accept : thread waiting connections")
+        client_socket = ""
         address = ""
-        try: 
-            (clientsocket, address) = server_socket.accept()
+        try:
+            (client_socket, address) = server_socket.accept()
         except (Exception):
-            traceback.print_exc() 
+            traceback.print_exc()
             logging.info("Vehicle - T_accept : failing in accepting the connection")
             continue
 
@@ -82,7 +80,6 @@ def server_vehicle_accept(server_socket):
         recv_thread.start()
         logging.info("Vehicle - T_accept : created new thread for the recv of the sensor data")
 
-        # TODO ?????: creare una lista dei  client associati al cloud in questo momento
     return
 
 
@@ -94,7 +91,6 @@ def server_vehicle_recv(sensor_socket):
     logging.info("Vehicle - T_recv : new buffer received ")
     logging.info(str(buffer))
 
-    # TODO: specificare l'eccezione sollevata
     try:
         request_id = buffer["requestID"]
         data_type = buffer["dataType"]
@@ -107,7 +103,7 @@ def server_vehicle_recv(sensor_socket):
 
     # bind con la parte di federico
     # user_id = identify_user(request_id, data_type, data)
-
+    response = recognize_user(request_id, data_type, data)
     request_id = response[0]
     user_id = response[1]
 
@@ -157,30 +153,6 @@ def server_vehicle_recv(sensor_socket):
 #     return user_id
 
 
-    # invio i dati
-    s.sendall( json.dumps( payload).encode('utf-8') )
-
-    logging.info("Sensor : request for userID sended")
-    
-    buffer = recv( s )
-    s.close()
-    logging.info("Sensor : Response received, socket closed")
-    
-    request_id = ""
-    user_id = ""
-    try:
-       request_id = buffer["requestID"]
-       user_id = buffer["userID"]
-    except(Exception):
-        logging.info("Sensor  : failed in parsing the data")
-        return False
-    
-    if request_id != requestID:
-        logging.info("Sensor  : The request identificator doasn't correspond")
-        return False
-
-    return user_id
-
 # f chiamata dal veicolo per rispondere alla richiesta del sensore
 def return_user_identifier(request_id, user_id, sensor_socket):
     payload = {'requestID': request_id, 'userID': user_id}
@@ -194,7 +166,6 @@ def return_user_identifier(request_id, user_id, sensor_socket):
 vehicle_server = Server(VEHICLE_IN_PORT, "Vehicle - Main", server_vehicle_accept)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 
 
 # ++++++++++++++++++++++++++++++++ Logica di comunicazione veicolo - cloud ++++++++++++++++++++++++++
@@ -219,7 +190,6 @@ def server_cloud_accept(server_socket):
         recv_thread.start()
         logging.info("Cloud - T_accept : created new thread for the recv of the sensor data")
 
-        # TODO ????: creare una lista dei  client associati al cloud in questo momento
     return
 
 
@@ -236,8 +206,8 @@ def server_cloud_recv(vehicle_socket):
         vehicle_socket.close()
         logging.info("Cloud - T_recv : closed socket with vehicle " + str(vehicle_socket))
         return
-    # TODO: non ho capito
-    # res = update_handler(buffer, vehicle_socket)
+    res = update_handler(buffer, vehicle_socket)
+
     return res
 
 
@@ -320,8 +290,6 @@ def update_remote_ump(inquiry_id, ump):
 
 
 def request_handler(buffer, vehicle_socket):
-    # TODO: specificare l'eccezione sollevata
-
     try:
         inquiry_id = buffer["inquiryID"]
         data_type = buffer["dataType"]
@@ -333,16 +301,16 @@ def request_handler(buffer, vehicle_socket):
     logging.info("Cloud - T_recv : data successfully parsed")
 
     # bind con la parte di federico
-    if data_type is 'modify':
-        response = modify_fields_user(data['_id'], data['field'], data['value'])
-        if response.acknowledged is not True:
-            return False
-        else:
-            return True
-    else:
-        response = recognize_user_server(inquiry_id, data_type, data)
-        inquiry_id = response[0]
-        user_id = response[1]
+    # if data_type is 'modify':
+    #     response = modify_fields_user(data['_id'], data['field'], data['value'])
+    #     if response.acknowledged is not True:
+    #         return False
+    #     else:
+    #         return True
+    # else:
+    response = recognize_user_server(inquiry_id, data_type, data)
+    inquiry_id = response[0]
+    user_id = response[1]
 
     return return_remote_ump(inquiry_id, user_id, vehicle_socket)
 
@@ -350,17 +318,16 @@ def request_handler(buffer, vehicle_socket):
 def update_handler(buffer, vehicle_socket):
     inquiry_id = ""
 
-    # TODO: specificare l'eccezione sollevata
     try:
         inquiry_id = buffer["inquiryID"]
         ump = buffer["UMP"]
     except Exception:
         logging.info("Cloud - T_recv  : fail in parsing the data")
-        return
+        return False
 
     logging.info("Cloud - T_recv : data successfully parsed")
 
-    # bind con la parte di federico
+    # bind con la parte di federico #todo: aggiusta
     # res = update_ump( ump )
     res = True
     if res:
@@ -372,4 +339,4 @@ def update_handler(buffer, vehicle_socket):
 
     vehicle_socket.sendall(json.dumps(payload).encode('utf-8'))
     logging.info("Vehicle - T_recv : UMP successfully sended")
-    return
+    return True
