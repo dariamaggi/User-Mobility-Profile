@@ -142,6 +142,14 @@ class MainWindow(Frame):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - " + value)
         t.geometry("760x660+350+300")
+        path = ""#TODO: inserire il path del cuore
+
+        im = Image.open(path)
+        photo = ImageTk.PhotoImage(im)
+
+        label = Label(t, image=photo)
+        label.image = photo  # keep a reference!
+        label.pack()
 
         u_frame = LabelFrame(t)
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + value, bd=18)
