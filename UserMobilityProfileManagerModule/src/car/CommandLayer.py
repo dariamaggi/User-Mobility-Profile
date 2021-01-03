@@ -14,7 +14,7 @@ from UserMobilityProfileMain import recognize_user, modify_fields_user, recogniz
 config = configparser.ConfigParser()
 path = Path(__file__).parent.parent
 # config.read('/files/configurations.ini')
-config.read(os.path.join(path, 'files', 'configurations.ini'))
+config.read(os.path.join(path, 'files', '../../files/configurations.ini'))
 setting = config['settings']
 
 MTU = 1024

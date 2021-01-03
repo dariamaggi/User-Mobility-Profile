@@ -8,7 +8,7 @@ from DatabaseConnector import *
 # prendere dati da config file
 config = configparser.ConfigParser()
 path = Path(__file__).parent.parent
-config.read(os.path.join(path, 'files', 'configurations.ini'))
+config.read(os.path.join(path, 'files', '../../files/configurations.ini'))
 setting = config['settings']
 
 

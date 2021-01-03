@@ -13,5 +13,5 @@ config['settings'] = {
     'sound_path': 'files/sounds',
     'mongo_con': 'localhost',
     'mtu': '1024'}
-with open('../files/configurations.ini', 'w') as configfile:
+with open('../../files/configurations.ini', 'w') as configfile:
     config.write(configfile)

@@ -1,7 +1,7 @@
 import sys
 from unittest import TestCase
 
-from DatabaseConnector import *
+from car.DatabaseConnector import *
 
 
 def open_db():
