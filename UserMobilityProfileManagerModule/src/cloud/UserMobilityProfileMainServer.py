@@ -7,13 +7,6 @@ import traceback
 import json
 from common.DatabaseConnector import *
 
-# # prendere dati da config file
-# config = configparser.ConfigParser()
-# path = Path(__file__).parent.parent
-# # config.read('/files/configurations.ini')
-# config.read(os.path.join(path, 'files', '../../files/configurations.ini'))
-# setting = config['settings']
-
 MTU = 1024
 CLOUD_IN_PORT = 55452
 CLOUD_URL = '192.168.1.211'
