@@ -144,17 +144,18 @@ class MainWindow(Frame):
         t.geometry("760x660+350+300")
         path = ""#TODO: inserire il path del cuore
 
-        im = Image.open(path)
-        photo = ImageTk.PhotoImage(im)
 
-        label = Label(t, image=photo)
-        label.image = photo  # keep a reference!
-        label.pack()
 
         u_frame = LabelFrame(t)
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + value, bd=18)
         left.grid(row=2, column=2)
+        im = Image.open(path)
+        im = im.resize((200, 200), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(im)
 
+        label = Label(u_frame, image=photo)
+        label.image = photo  # keep a reference!
+        label.grid(row=3, column=2)
         canvas1 = Canvas(u_frame)
 
         canvas1.grid(row=4, column=1, padx=10)
