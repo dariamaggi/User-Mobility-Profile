@@ -1,19 +1,18 @@
-from UserIdentificationLogic import *
-from DatabaseConnector import *
+
 import configparser
 import logging
-from DatabaseConnector import read_all_audios
+import os
+from pathlib import Path
+from common.DatabaseConnector import read_all_audios
 from os import listdir
 from os.path import isfile, join
-
 import acoustid
 import chromaprint
-
 from fuzzywuzzy import fuzz
 
 config = configparser.ConfigParser()
-path = Path(__file__).parent.parent
-config.read(os.path.join(path, 'files', '../../files/configurations.ini'))
+path = Path(__file__).parent.parent.parent
+config.read(os.path.join(path, 'files', 'configurations.ini'))
 setting = config['settings']
 
 

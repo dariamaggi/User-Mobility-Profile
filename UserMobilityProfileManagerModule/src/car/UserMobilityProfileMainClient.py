@@ -1,9 +1,9 @@
 from bson import ObjectId
-from UserIdentificationLogic import *
-from CommandLayer import request_remote_ump
+from common.UserIdentificationLogic import *
+from CommandLayerClient import request_remote_ump
 import logging
 
-from DatabaseConnector import *
+from common.DatabaseConnector import *
 
 # prendere dati da config file
 config = configparser.ConfigParser()
