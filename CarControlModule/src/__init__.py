@@ -1,5 +1,6 @@
-
 import os
+import threading
+
 import pyaudio
 import wave
 import socket  # Import socket module
@@ -9,6 +10,7 @@ import pathlib
 from scipy.io.wavfile import read
 import traceback
 import json
+from picamera import PiCamera
 
 form_1 = pyaudio.paInt16
 chans = 1
@@ -23,27 +25,9 @@ VEHICLE_URL = '192.168.1.211'
 MTU = 1024
 
 
-if __name__ == '__main__':
-    print('Start Server')
-
-
-def thread_function(name):
-    logging.info("Thread %s: starting", name)
-    time.sleep(2)
-    logging.info("Thread %s: finishing", name)
-
-
-def main():
-    """Entry point for the application script"""
-
-    thread_function(target=get_foto())
-    thread_function(target=get_audio())
-
-    print("Call your main application code here")
-
-
-def get_foto():
+def get_photo():
     camera = PiCamera()
+    print('Start camera')
     counter = 0
     while 1 == 1:
         counter = counter + 1
@@ -52,17 +36,16 @@ def get_foto():
         camera.capture(os.path.join(pathlib.Path(__file__), 'image.png'))
         # camera.stop_preview()
         data = open(os.path.join(pathlib.Path(__file__), 'image.png'))
-        user_id = request_user(counter, 'song', data)
+        user_id = request_user(counter, 'photo', data)
         time.sleep(10)
 
 
-def get_audio():
-    audio = pyaudio.PyAudio()  # istanza pyaudio
+def get_audio():  # istanza pyaudio
     counter = 0
+    audio = pyaudio.PyAudio()
+    print('start audio')
     while 1 == 1:
         counter = counter + 1
-
-        audio = pyaudio.PyAudio()
 
         # setup audio input stream
         stream = audio.open(format=form_1, rate=samp_rate, channels=chans, input_device_index=dev_index, input=True,
@@ -145,3 +128,20 @@ def recv(sock):
         except Exception:
             b = sock.recv(MTU)
     return res
+
+
+def main():
+    """Entry point for the application script"""
+
+    t1 = threading.Thread(target=get_audio())
+    t1.start
+
+    t2 = threading.Thread(target=get_photo())
+    t2.start
+
+    print("Call your main application code here")
+
+
+if __name__ == '__main__':
+    print('Start sensors')
+    main()
