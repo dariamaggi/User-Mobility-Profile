@@ -6,4 +6,4 @@ if __name__ == '__main__':
 def main():
     """Entry point for the application script"""
     print("Call your main application code here")
-    Server()
+    cloud_server.setup()
