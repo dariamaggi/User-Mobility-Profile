@@ -7,13 +7,14 @@ import threading
 import traceback
 import json
 
-from UserMobilityProfileMain import recognize_user, modify_fields_user, recognize_user_server
+
+from UserMobilityProfileMainClient import recognize_user
 
 # prendere dati da config file
 config = configparser.ConfigParser()
-path = Path(__file__).parent.parent
+path = Path(__file__).parent.parent.parent
 # config.read('/files/configurations.ini')
-config.read(os.path.join(path, 'files', '../../files/configurations.ini'))
+config.read(os.path.join(path, 'files', 'configurations.ini'))
 setting = config['settings']
 
 MTU = 1024

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from car.UserIdentificationLogic import *
+from common.UserIdentificationLogic import *
 
 
 def open_db():
