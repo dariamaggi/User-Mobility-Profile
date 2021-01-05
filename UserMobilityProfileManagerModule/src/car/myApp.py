@@ -18,19 +18,28 @@ class UserProfile(Frame):
         init_ui(value)
 
 
-def load_images(path):
-    # return array of images
-
-    images_list = os.listdir(path)
-    loaded_images = []
-    for image in images_list:
-        img = PImage.open(path + image)
-        loaded_images.append(img)
 
 
-def edit(name, arg1):
-    name.configure(text=arg1)
-    print(arg1)
+def edit(name, arg1, surname, arg2, age, arg3,gender, arg4,country, arg5):
+
+        if len(arg1.get())!=0:
+            name.configure(text="Name: "+arg1.get())
+            #TODO modify_fields_user(id, "name")
+        if len(arg2.get())!=0:
+            surname.configure(text="Surname: "+arg2.get())
+            #TODO modify_fields_user(id, "surname")
+        if len(arg3.get())!=0:
+            age.configure(text="Age: "+arg3.get())
+            #TODO modify_fields_user(id, "age")
+        if arg4.get()!="-":
+            gender.configure(text="Gender: "+arg4.get())
+            #TODO modify_fields_user(id, "age")
+        if  arg5.get()!="-": #Country
+            country.configure(text="Country: "+arg5.get())
+            #TODO modify_fields_user(id, "age")
+
+
+
 
 
 def read_from_ump(value):
@@ -105,38 +114,62 @@ class MainWindow(Frame):
     def on_exit(self):
         self.quit()
 
-    def open_edit(self, name, surname):
+    def open_edit(self, name, surname, age, gender, country, home_loc, job_loc):
         t = Toplevel(self)
         t.wm_title("Edit Profile")
-        t.geometry("400x460+350+300")
+        t.geometry("400x460+400+300")
         Label(t, font=('lato', 20), text="Edit profile", bd=18, justify="left").pack()
 
         u_frame = Frame(t)
         u_frame.pack()
 
         row = 2
-
-        name_lab = Label(u_frame, font=('lato', 16), text="Name :", anchor='w', bd=18, justify="left")
+        name_var=StringVar()
+        name_lab = Label(u_frame, font=('lato', 16),text="Name :", anchor='w', bd=18, justify="left")
         name_lab.grid(row=row, column=1)
 
-        name_entry = Entry(u_frame)
-        name_entry.insert(0, read_from_ump("Name"))
+        name_entry = Entry(u_frame, textvariable=name_var)
         name_entry.grid(row=row, column=2)
 
         row += 1
-        lbl_surname = Label(u_frame, font=('lato', 16), text="Surname :", anchor='w', bd=18, justify="left").grid(
+        surname_var=StringVar()
+
+        Label(u_frame, font=('lato', 16), text="Surname :", anchor='w', bd=18, justify="left").grid(
             row=row, column=1)
-        entry_surname = Entry(u_frame)
-        entry_surname.insert(0, read_from_ump("Surname"))
+        entry_surname = Entry(u_frame, textvariable=surname_var)
         entry_surname.grid(row=row, column=2)
 
         row += 1
         Label(u_frame, font=('lato', 16), text="Age :", anchor='w', bd=18, justify="left").grid(row=row, column=1)
         entry_age = Entry(u_frame)
-        entry_age.insert(0, read_from_ump("Age"))
         entry_age.grid(row=row, column=2)
 
-        Button(t, text="ubmit", command=lambda nme=name, arg1=name_entry.get(): edit(nme, arg1)).pack()
+        checkCmd = IntVar()
+        checkCmd.set(0)
+        row += 1
+
+        choices = ['-','male', 'female']
+        variable = StringVar()
+        variable.set('-')
+
+        Label(u_frame, font=('lato', 16), text="Gender :", anchor='w', bd=18, justify="left").grid(row=row, column=1)
+        entry_gender = OptionMenu(u_frame, variable,*choices)
+        entry_gender.grid(row=row, column=2)
+
+        row += 1
+
+        country_var=StringVar()
+        country_var.set("-")
+        choice = ['Austria','Colombia', 'Italia']
+
+        Label(u_frame, font=('lato', 16), text="Country :", anchor='w', bd=18, justify="left").grid(row=row, column=1)
+        country_gender = OptionMenu(u_frame, country_var,*choice)
+        country_gender.grid(row=row, column=2)
+
+
+        Button(t, text="Submit", command=lambda nme=name, arg1=name_var, srnme=surname, arg2= surname_var, age=age,
+        arg3=entry_age, gender=gender, arg4=variable,country=country, arg5=country_var: edit(nme, arg1, srnme,arg2, age, arg3, gender, arg4, country, arg5)).pack()
+        Button(t, text="Close", command=t.destroy).pack()
 
     def open_profile(self, value):
         t = Toplevel(self)
@@ -149,12 +182,11 @@ class MainWindow(Frame):
         u_frame = LabelFrame(t)
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + value, bd=18)
         left.grid(row=2, column=2)
-        im = Image.open(path)
-        im = im.resize((200, 200), Image.ANTIALIAS)
-        photo = ImageTk.PhotoImage(im)
-
-        label = Label(u_frame, image=photo)
-        label.image = photo  # keep a reference!
+#        im = Image.open(path)
+ #       im = im.resize((200, 200), Image.ANTIALIAS)
+ #       photo = ImageTk.PhotoImage(im)
+        label = Label(u_frame)
+     #   label = Label(u_frame, image=photo)
         label.grid(row=3, column=2)
         canvas1 = Canvas(u_frame)
 
@@ -230,7 +262,8 @@ class MainWindow(Frame):
         lbl_musicvolume.pack()
         u_frame.pack(fill="both", expand="yes")
         Button(u_frame, text="Edit", font=('lato', 18),
-               command=lambda name=lbl_name, surname=lbl_surname: self.open_edit(name, surname)).grid(row=2, column=3)
+               command=lambda name=lbl_name, surname=lbl_surname, age=lbl_age, gender=lbl_gender,
+               country=lbl_country, home_loc=lbl_homeloc, job_loc=lbl_jobloc: self.open_edit(name, surname, age, gender, country, home_loc, job_loc)).grid(row=2, column=3)
 
         # label with image
         l_frame = LabelFrame(t)
@@ -249,7 +282,6 @@ class MainWindow(Frame):
 
         [listbox1.insert(END, " " + elem) for elem in self.listbox1.get(0, self.listbox1.size() - 1)]
 
-        # TODO: handle image
 
 
 def main():
