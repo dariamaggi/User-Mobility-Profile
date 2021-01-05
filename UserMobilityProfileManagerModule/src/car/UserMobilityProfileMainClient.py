@@ -7,8 +7,8 @@ from common.DatabaseConnector import *
 
 # prendere dati da config file
 config = configparser.ConfigParser()
-path = Path(__file__).parent.parent
-config.read(os.path.join(path, 'files', '../../files/configurations.ini'))
+path = Path(__file__).parent.parent.parent
+config.read(os.path.join(path, 'files', 'configurations.ini'))
 setting = config['settings']
 
 
@@ -162,7 +162,6 @@ def recognize_user(request_id, data_type, data):
     response = []
     if user is None:
         logging.info('User is not identified on local')
-        # todo: ricorda di cambiare questa cosa sul server
         user = request_user_cloud(request_id, data_type, data)
         if user is None:
             logging.info('User is not identified on cloud, create temp user')
@@ -173,31 +172,7 @@ def recognize_user(request_id, data_type, data):
     response.insert(request_id)
     response.insert(user)
 
-    os.remove(data_path)  # pulisce
-    return response
-
-
-def recognize_user_server(request_id, data_type, data):
-    db = open_db()
-    if data_type is 'song':
-        data_path = os.path.join(setting['temp_path'], 'temp' + '.wav')
-        flag = 1
-    elif data_type is 'photo':
-        data_path = os.path.join(setting['temp_path'], 'temp' + '.png')
-        flag = 0
-    else:
-        return False
-    output = open(data_path, 'wb')
-    output.write(data)
-    output.close()
-    user = identify_user(data_path, flag, db)
-
-    response = []
-    if user is None:
-        logging.info('User is not identified on server')
-
-    response.insert(request_id)
-    response.insert(None)
+    # TODO: chiamare gui
 
     os.remove(data_path)  # pulisce
     return response
