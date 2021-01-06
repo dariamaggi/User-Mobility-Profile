@@ -425,7 +425,7 @@ class MainWindow(Frame):
 
     def add_user(self, client):
         for item in self.users:
-            if item["_id"] is client:  # todo: sbagliato
+            if client["_id"] is item["_id"]:  # todo: sbagliato
                 return False
         self.users.append(client)
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["name"] + " " + client[
