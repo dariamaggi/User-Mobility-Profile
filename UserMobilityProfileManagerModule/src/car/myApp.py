@@ -29,8 +29,9 @@ class UserProfile(Frame):
         init_ui(value)
 
 
-def edit(main_listbox, user_id, client,listbox, name, arg1, surname, arg2, age, arg3, gender, arg4, country, arg5, home_loc,
-         arg6, job_loc, arg7, app_list, arg8,serv_list, arg9):
+def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age, arg3, gender, arg4, country, arg5,
+         home_loc,
+         arg6, job_loc, arg7, app_list, arg8, serv_list, arg9):
     time = datetime.datetime.now()
     if len(arg1.get()) != 0:
         result = modify_fields_user(id, "name", arg1.get())
@@ -40,7 +41,7 @@ def edit(main_listbox, user_id, client,listbox, name, arg1, surname, arg2, age, 
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
 
     if len(arg2.get()) != 0:
-        result =modify_fields_user(id, "surname", arg2.get())
+        result = modify_fields_user(id, "surname", arg2.get())
         if result:
             surname.configure(text="Surname: " + arg2.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field surname: " + arg2.get())
@@ -49,7 +50,7 @@ def edit(main_listbox, user_id, client,listbox, name, arg1, surname, arg2, age, 
     if len(arg3.get()) != 0:
         try:
             int(str(arg3.get()))  # check if a number was actually entered
-            result=modify_fields_user(id, "age", arg3.get())
+            result = modify_fields_user(id, "age", arg3.get())
             if result:
                 age.configure(text="Age: " + arg3.get())
                 listbox.insert(END, str(time) + ": updated profile " + user_id + " field age: " + arg3.get())
@@ -58,28 +59,28 @@ def edit(main_listbox, user_id, client,listbox, name, arg1, surname, arg2, age, 
             messagebox.showwarning(title=None, message="Age entered is not numeric.")
 
     if arg4.get() != "-":
-        result=modify_fields_user(id, "gender", arg4.get())
+        result = modify_fields_user(id, "gender", arg4.get())
         if result:
             gender.configure(text="Gender: " + arg4.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
 
     if arg5.get() != "-":  # Country
-        result=modify_fields_user(id, "country", arg5.get())
+        result = modify_fields_user(id, "country", arg5.get())
         if result:
             country.configure(text="Country: " + arg5.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
 
     if len(arg6.get()) != 0:  # home location
-        result=modify_fields_user(id, "home_location", arg6.get())
+        result = modify_fields_user(id, "home_location", arg6.get())
         if result:
             home_loc.configure(text="Home Location: " + arg6.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
 
     if len(arg7.get()) != 0:  # job location
-        result=modify_fields_user(id, "job location", arg7.get())
+        result = modify_fields_user(id, "job location", arg7.get())
         if result:
             job_loc.configure(text="Home Location: " + arg7.get())
 
@@ -98,6 +99,11 @@ def edit(main_listbox, user_id, client,listbox, name, arg1, surname, arg2, age, 
                 app_list.insert(END, new_item)
 
 
+def get_field(client, field):
+    if field in client.keys():
+        return client[field]
+    return ""
+
 
 class MainWindow(Frame):
 
@@ -111,7 +117,7 @@ class MainWindow(Frame):
 
     def populate_method(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + method)
-        client=[client if client["_id"]==method else {} for client in self.users]
+        client = [client if client["_id"] == method else {} for client in self.users]
         self.open_profile(client)
 
     def set_scrollregion(self, event):
@@ -131,7 +137,6 @@ class MainWindow(Frame):
         path = FOLDERPATH  # TODO: add path to folder
 
         for client_id in list_ids:
-            os.path.join()
             im = Image.open(os.path.join(path, client_id + '.png'))
             im = im.resize((100, 100), Image.ANTIALIAS)
             photo = ImageTk.PhotoImage(im)
@@ -237,17 +242,17 @@ class MainWindow(Frame):
         Entry(u_frame, textvariable=job_loc_var, ).grid(row=row, column=2)
         row += 1
         Label(u_frame, font=('lato', 16), text="Application List:", anchor='w', bd=18, justify="left").grid(row=row,
-                                                                                                        column=1)
+                                                                                                            column=1)
 
-        app_list_var=StringVar()
+        app_list_var = StringVar()
 
-        txt=Text(u_frame, textvariable=app_list_var)
+        txt = Text(u_frame, textvariable=app_list_var)
         for val in value["application_list"]:
-            txt.insert(END, val+",")
+            txt.insert(END, val + ",")
 
         row += 1
         Label(u_frame, font=('lato', 16), text="Service List:", anchor='w', bd=18, justify="left").grid(row=row,
-                                                                                                            column=1)
+                                                                                                        column=1)
 
         serv_list_var = StringVar()
 
@@ -258,30 +263,29 @@ class MainWindow(Frame):
         row += 1
 
         Button(t, text="Submit",
-               command=lambda user_id=value["_id"], client=value,listbox=listbox, nme=name, arg1=name_var, srnme=surname,
+               command=lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
+                              srnme=surname,
                               arg2=surname_var, age=age,
                               arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
                               home_loc=home_loc, arg6=home_loc_var,
-                              job_loc=job_loc, arg7=job_loc_var, app_list=app_list, arg8=app_list_var, serv_list=serv_list, arg9=serv_list_var
-                                                                    : edit(self.listbox1, user_id, client,listbox, nme, arg1, srnme,
-                                                                      arg2, age, arg3, gender, arg4, country, arg5,
-                                                                      home_loc, arg6, job_loc, arg7, app_list, arg8, serv_list, arg9)).pack()
+                              job_loc=job_loc, arg7=job_loc_var, app_list=app_list, arg8=app_list_var,
+                              serv_list=serv_list, arg9=serv_list_var
+               : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
+                      arg2, age, arg3, gender, arg4, country, arg5,
+                      home_loc, arg6, job_loc, arg7, app_list, arg8, serv_list, arg9)).pack()
         # todo: ag service list and app list
 
         Button(t, text="Close", command=t.destroy).pack()
-    def get_field(self, client,field):
-        if field in client.keys():
-            return client[field]
-        return ""
 
     def open_profile(self, client):
         t = Toplevel(self)
-        t.wm_title("User Mobility Profile - " + client["name"] + " "+ client["surname"])
+        t.wm_title("User Mobility Profile - " + client["name"] + " " + client["surname"])
         t.geometry("760x660+250+300")
-        path = FOLDERPATH  # TODO: inserire il path del cuore
+        path = FOLDERPATH  # TODO: inserire il path
 
         u_frame = LabelFrame(t)
-        left = Label(u_frame, font=('lato', 18), text="User Profile -" + + client["name"] + " "+ client["surname"],bd=18)
+        left = Label(u_frame, font=('lato', 18), text="User Profile -" + + client["name"] + " " + client["surname"],
+                     bd=18)
         left.grid(row=2, column=2)
 
         im = Image.open(path)  # todo: os.path.join()
@@ -296,26 +300,26 @@ class MainWindow(Frame):
         canvas1.grid(row=4, column=1, padx=10)
         # call procedure to populate canvas
 
-        lbl_name = Label(canvas1, font=('lato', 16), text="Name: " + self.get_field(client,'name'), anchor='w',
+        lbl_name = Label(canvas1, font=('lato', 16), text="Name: " + get_field(client, 'name'), anchor='w',
                          bd=18,
                          justify="left")
         lbl_name.pack()
 
-        lbl_surname = Label(canvas1, font=('lato', 16), text="Surname: " +  self.get_field(client,'surname'),
+        lbl_surname = Label(canvas1, font=('lato', 16), text="Surname: " + get_field(client, 'surname'),
                             anchor='w',
                             bd=18, justify="left")
         lbl_surname.pack()
 
-        lbl_age = Label(canvas1, font=('lato', 16), text="Age: " +  self.get_field(client,'age'), anchor='w', bd=18,
+        lbl_age = Label(canvas1, font=('lato', 16), text="Age: " + get_field(client, 'age'), anchor='w', bd=18,
                         justify="left")
         lbl_age.pack()
 
-        lbl_gender = Label(canvas1, font=('lato', 16), text="Gender: " +  self.get_field(client,'gender'), anchor='w',
+        lbl_gender = Label(canvas1, font=('lato', 16), text="Gender: " + get_field(client, 'gender'), anchor='w',
                            bd=18,
                            justify="left")
         lbl_gender.pack()
 
-        lbl_country = Label(canvas1, font=('lato', 16), text="Country: "  +  self.get_field(client,'country'),
+        lbl_country = Label(canvas1, font=('lato', 16), text="Country: " + get_field(client, 'country'),
                             anchor='w',
                             bd=18, justify="left")
         lbl_country.pack()
@@ -324,27 +328,27 @@ class MainWindow(Frame):
         canvas2.grid(row=4, column=2)
 
         lbl_homeloc = Label(canvas2, font=('lato', 16),
-                            text="Home Location: " +  self.get_field(client,'home_location'),
+                            text="Home Location: " + get_field(client, 'home_location'),
                             anchor='w', bd=18, justify="left")
         lbl_homeloc.pack()
 
-        lbl_jobloc = Label(canvas2, font=('lato', 16), text="Job Location: "  +  self.get_field(client,'job_location'),
+        lbl_jobloc = Label(canvas2, font=('lato', 16), text="Job Location: " + get_field(client, 'job_location'),
                            anchor='w', bd=18, justify="left")
         lbl_jobloc.pack()
 
         lbl_lochistory = Label(canvas2, font=('lato', 16),
-                               text="Location History: " +  self.get_field(client,'location_history'), anchor='w',
+                               text="Location History: " + get_field(client, 'location_history'), anchor='w',
                                bd=18,
                                justify="left")
         lbl_lochistory.pack()
 
         lbl_drivingstyle = Label(canvas2, font=('lato', 16),
-                                 text="Driving Style: " +  self.get_field(client,'driving_style'),
+                                 text="Driving Style: " + get_field(client, 'driving_style'),
                                  anchor='w', bd=18, justify="left")
         lbl_drivingstyle.pack()
 
         lbl_seatincl = Label(canvas2, font=('lato', 16),
-                             text="Seat Inclination: "+  self.get_field(client,'seat_inclination'), anchor='w',
+                             text="Seat Inclination: " + get_field(client, 'seat_inclination'), anchor='w',
                              bd=18,
                              justify="left")
         lbl_seatincl.pack()
@@ -353,27 +357,27 @@ class MainWindow(Frame):
         canvas3.grid(row=4, column=3)
 
         lbl_seator = Label(canvas3, font=('lato', 16),
-                           text="Seat Orientation: " +  self.get_field(client,"seat_orientation"),
+                           text="Seat Orientation: " + get_field(client, "seat_orientation"),
                            anchor='w', bd=18, justify="left")
         lbl_seator.pack()
 
         lbl_temp = Label(canvas3, font=('lato', 16),
-                         text="Temperature: " +  self.get_field(client,'temperature_level'),
+                         text="Temperature: " + get_field(client, 'temperature_level'),
                          anchor='w', bd=18, justify="left")
         lbl_temp.pack()
 
         lbl_lightlevel = Label(canvas3, font=('lato', 16),
-                               text="Light Level: " +  self.get_field(client,'light_level'),
+                               text="Light Level: " + get_field(client, 'light_level'),
                                anchor='w', bd=18, justify="left")
         lbl_lightlevel.pack()
 
         lbl_musicgenres = Label(canvas3, font=('lato', 16),
-                                text="Music Genres: "+  self.get_field(client,'music_genres'),
+                                text="Music Genres: " + get_field(client, 'music_genres'),
                                 anchor='w', bd=18, justify="left")
         lbl_musicgenres.pack()
 
         lbl_musicvolume = Label(canvas3, font=('lato', 16),
-                                text="Music Volume: " +  self.get_field(client, 'music_volume'),
+                                text="Music Volume: " + get_field(client, 'music_volume'),
                                 anchor='w', bd=18, justify="left")
         lbl_musicvolume.pack()
 
@@ -407,25 +411,27 @@ class MainWindow(Frame):
         [listbox1.insert(END, " " + elem) for elem in self.listbox1.get(0, self.listbox1.size() - 1)]
         Button(u_frame, text="Edit", font=('lato', 18),
                command=lambda name=lbl_name, surname=lbl_surname, age=lbl_age, gender=lbl_gender,
-                              country=lbl_country, home_loc=lbl_homeloc, job_loc=lbl_jobloc, app_list=listbox_applications,
-                                                                         serv_list=listbox_services: self.open_edit(client,
-                                                                                                            listbox1,
-                                                                                                            name,
-                                                                                                            surname,
-                                                                                                            age, gender,
-                                                                                                            country,
-                                                                                                            home_loc,
-                                                                                                            job_loc,
-                                                                                                            app_list,
-                                                                                                            serv_list)).grid(
+                              country=lbl_country, home_loc=lbl_homeloc, job_loc=lbl_jobloc,
+                              app_list=listbox_applications,
+                              serv_list=listbox_services: self.open_edit(client,
+                                                                         listbox1,
+                                                                         name,
+                                                                         surname,
+                                                                         age, gender,
+                                                                         country,
+                                                                         home_loc,
+                                                                         job_loc,
+                                                                         app_list,
+                                                                         serv_list)).grid(
             row=2, column=3)
 
     def add_user(self, client):
         for item in self.users:
-            if item["_id"] == client:
+            if item["_id"] == client:  # todo: sbagliato
                 return False
         self.users.append(client)
-        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : "+client["name"]+ " "+ client["surname"])
+        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["name"] + " " + client[
+            "surname"])
         return True
 
     def listbox_insert(self, value):
