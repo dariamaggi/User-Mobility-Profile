@@ -11,7 +11,10 @@ from json import loads
 
 def init_ui(info):
     print(info)
-
+def on_click(event=None):
+    # `command=` calls function without argument
+    # `bind` calls function with one argument
+    print("image clicked")
 
 class UserProfile(Frame):
     def __init__(self, value):
@@ -115,12 +118,19 @@ class MainWindow(Frame):
 
         i = 1
 
-        for method in ["id_0", "id_1"]:
-            # button = Button(self.canvas, text=method,image=img,command=lambda m=method: self.populateMethod(m),
-            # font=('lato', 18), bd=18)
-            button = Button(self.canvas, text=method, command=lambda m=method: self.populate_method(m),
-                            font=('lato', 18), bd=18)
-            button.grid(row=0, column=i)
+        list_ids=[item["_id"] for item in self.users]
+        paths=""#TODO: add path to folder
+
+        [get_image_by_id(id) for id in list_ids] #adds the images
+
+
+        path=""
+        for method in list_ids:
+            im = Image.open(path + method+".png")
+            im = im.resize((100, 100), Image.ANTIALIAS)
+            photo = ImageTk.PhotoImage(im)
+            button = Button(self.canvas, text=method,image=photo,compound="top", command=lambda m=method: self.populate_method(m),  font=('lato', 18), bd=18)
+            button.grid(row=i, column=2)
             i += 1
 
         self.canvas.create_window((0, 0), window=self.frame, anchor=NW)
@@ -240,12 +250,17 @@ class MainWindow(Frame):
         u_frame = LabelFrame(t)
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + value, bd=18)
         left.grid(row=2, column=2)
-#        im = Image.open(path)
- #       im = im.resize((200, 200), Image.ANTIALIAS)
- #       photo = ImageTk.PhotoImage(im)
-        label = Label(u_frame)
-     #   label = Label(u_frame, image=photo)
+        #TODO: add image
+
+ '''
+        im = Image.open(path)
+        im = im.resize((200, 200), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(im)
+        label = Label(u_frame, image=photo)
         label.grid(row=3, column=2)
+'''
+
+
         canvas1 = Canvas(u_frame)
 
         canvas1.grid(row=4, column=1, padx=10)
