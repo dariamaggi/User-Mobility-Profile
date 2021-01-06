@@ -131,12 +131,12 @@ class MainWindow(Frame):
         i = 1
         # paths=FOLDERPATH
         # todo: attenzone a list_id --> client_id
-        list_ids = [item["_id"] for item in self.users]
-        [get_image_by_id(id) for id in list_ids]  # adds the images
+        client_ids = [item["_id"] for item in self.users]
+        [get_image_by_id(id) for id in client_ids]  # adds the images to the folder
 
         path = FOLDERPATH  # TODO: add path to folder
 
-        for client_id in list_ids:
+        for client_id in client_ids:
             im = Image.open(os.path.join(path, client_id + '.png'))
             im = im.resize((100, 100), Image.ANTIALIAS)
             photo = ImageTk.PhotoImage(im)
@@ -273,7 +273,6 @@ class MainWindow(Frame):
                : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
                       arg2, age, arg3, gender, arg4, country, arg5,
                       home_loc, arg6, job_loc, arg7, app_list, arg8, serv_list, arg9)).pack()
-        # todo: ag service list and app list
 
         Button(t, text="Close", command=t.destroy).pack()
 
@@ -287,8 +286,7 @@ class MainWindow(Frame):
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + + client["name"] + " " + client["surname"],
                      bd=18)
         left.grid(row=2, column=2)
-
-        im = Image.open(path)  # todo: os.path.join()
+        im = Image.open(os.path.join(path, client["_id"] + '.png'))
         im = im.resize((200, 200), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
         label = Label(u_frame, image=photo)
@@ -427,7 +425,7 @@ class MainWindow(Frame):
 
     def add_user(self, client):
         for item in self.users:
-            if item["_id"] == client:  # todo: sbagliato
+            if item["_id"] is client:  # todo: sbagliato
                 return False
         self.users.append(client)
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["name"] + " " + client[
