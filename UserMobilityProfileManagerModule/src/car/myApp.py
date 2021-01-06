@@ -269,6 +269,10 @@ class MainWindow(Frame):
         # todo: ag service list and app list
 
         Button(t, text="Close", command=t.destroy).pack()
+    def get_field(self, client,field):
+        if field in client.keys():
+            return client[field]
+        return ""
 
     def open_profile(self, client):
         t = Toplevel(self)
@@ -291,26 +295,27 @@ class MainWindow(Frame):
         # id = client['_id']
         canvas1.grid(row=4, column=1, padx=10)
         # call procedure to populate canvas
-        lbl_name = Label(canvas1, font=('lato', 16), text="Name: " + client['name'], anchor='w',
+
+        lbl_name = Label(canvas1, font=('lato', 16), text="Name: " + self.get_field(client,'name'), anchor='w',
                          bd=18,
                          justify="left")
         lbl_name.pack()
 
-        lbl_surname = Label(canvas1, font=('lato', 16), text="Surname: " +  client['surname'],
+        lbl_surname = Label(canvas1, font=('lato', 16), text="Surname: " +  self.get_field(client,'surname'),
                             anchor='w',
                             bd=18, justify="left")
         lbl_surname.pack()
 
-        lbl_age = Label(canvas1, font=('lato', 16), text="Age: " +  client[ 'age'], anchor='w', bd=18,
+        lbl_age = Label(canvas1, font=('lato', 16), text="Age: " +  self.get_field(client,'age'), anchor='w', bd=18,
                         justify="left")
         lbl_age.pack()
 
-        lbl_gender = Label(canvas1, font=('lato', 16), text="Gender: " +client[ 'gender'], anchor='w',
+        lbl_gender = Label(canvas1, font=('lato', 16), text="Gender: " +  self.get_field(client,'gender'), anchor='w',
                            bd=18,
                            justify="left")
         lbl_gender.pack()
 
-        lbl_country = Label(canvas1, font=('lato', 16), text="Country: " +client[  'country'],
+        lbl_country = Label(canvas1, font=('lato', 16), text="Country: "  +  self.get_field(client,'country'),
                             anchor='w',
                             bd=18, justify="left")
         lbl_country.pack()
@@ -319,27 +324,27 @@ class MainWindow(Frame):
         canvas2.grid(row=4, column=2)
 
         lbl_homeloc = Label(canvas2, font=('lato', 16),
-                            text="Home Location: "+client[ 'home_location'],
+                            text="Home Location: " +  self.get_field(client,'home_location'),
                             anchor='w', bd=18, justify="left")
         lbl_homeloc.pack()
 
-        lbl_jobloc = Label(canvas2, font=('lato', 16), text="Job Location: " +client[ 'job_location'],
+        lbl_jobloc = Label(canvas2, font=('lato', 16), text="Job Location: "  +  self.get_field(client,'job_location'),
                            anchor='w', bd=18, justify="left")
         lbl_jobloc.pack()
 
         lbl_lochistory = Label(canvas2, font=('lato', 16),
-                               text="Location History: " + client[ 'location_history'], anchor='w',
+                               text="Location History: " +  self.get_field(client,'location_history'), anchor='w',
                                bd=18,
                                justify="left")
         lbl_lochistory.pack()
 
         lbl_drivingstyle = Label(canvas2, font=('lato', 16),
-                                 text="Driving Style: " + client['driving_style'],
+                                 text="Driving Style: " +  self.get_field(client,'driving_style'),
                                  anchor='w', bd=18, justify="left")
         lbl_drivingstyle.pack()
 
         lbl_seatincl = Label(canvas2, font=('lato', 16),
-                             text="Seat Inclination: " + client[ 'seat_inclination'], anchor='w',
+                             text="Seat Inclination: "+  self.get_field(client,'seat_inclination'), anchor='w',
                              bd=18,
                              justify="left")
         lbl_seatincl.pack()
@@ -348,27 +353,27 @@ class MainWindow(Frame):
         canvas3.grid(row=4, column=3)
 
         lbl_seator = Label(canvas3, font=('lato', 16),
-                           text="Seat Orientation: " + client["seat_orientation"],
+                           text="Seat Orientation: " +  self.get_field(client,"seat_orientation"),
                            anchor='w', bd=18, justify="left")
         lbl_seator.pack()
 
         lbl_temp = Label(canvas3, font=('lato', 16),
-                         text="Temperature: "  + client['temperature_level'],
+                         text="Temperature: " +  self.get_field(client,'temperature_level'),
                          anchor='w', bd=18, justify="left")
         lbl_temp.pack()
 
         lbl_lightlevel = Label(canvas3, font=('lato', 16),
-                               text="Light Level: " + client[ 'light_level'],
+                               text="Light Level: " +  self.get_field(client,'light_level'),
                                anchor='w', bd=18, justify="left")
         lbl_lightlevel.pack()
 
         lbl_musicgenres = Label(canvas3, font=('lato', 16),
-                                text="Music Genres: " + client[  'music_genres'],
+                                text="Music Genres: "+  self.get_field(client,'music_genres'),
                                 anchor='w', bd=18, justify="left")
         lbl_musicgenres.pack()
 
         lbl_musicvolume = Label(canvas3, font=('lato', 16),
-                                text="Music Volume: " + client[ 'music_volume'],
+                                text="Music Volume: " +  self.get_field(client, 'music_volume'),
                                 anchor='w', bd=18, justify="left")
         lbl_musicvolume.pack()
 
