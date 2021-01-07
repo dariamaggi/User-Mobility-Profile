@@ -299,7 +299,6 @@ class MainWindow(Frame):
         left.grid(row=2, column=2)
 
         im = Image.open(os.path.join(path, client["_id"] + '.png'))
-        im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
         Label(u_frame, image=photo).grid(row=3, column=2)
 
@@ -432,11 +431,10 @@ class MainWindow(Frame):
         im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        Label(self.canvas, image=photo)
+       # Label(self.canvas, image=photo)
         Button(self.canvas, text=client["Name"] + " " + client[
-            "surname"],image=photo, compound="top",
-               command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
-
+            "surname"],  command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
+#image=photo, compound="top",
     def add_user(self, client):
         for item in self.users:
             if client["_id"] is item["_id"]:
