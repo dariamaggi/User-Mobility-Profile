@@ -120,8 +120,8 @@ class MainWindow(Frame):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
         client = ""
         for item in self.users:
-            if item["_id"]==method:
-                client=item
+            if item["_id"] == method:
+                client = item
                 break
         self.open_profile(client)
 
@@ -153,8 +153,8 @@ class MainWindow(Frame):
             im = Image.open(os.path.join(path, str(client_id) + '.png'))
             im = im.resize((100, 100), Image.ANTIALIAS)
             photo = ImageTk.PhotoImage(im)
-            label = Label(self.canvas, text=client_id, image=photo, compound="top"  , font=('lato', 18), bd=18)
-            label.bind('<Button-1>',lambda m=client_id: self.populate_method(m) )
+            label = Label(self.canvas, text=client_id, image=photo, compound="top", font=('lato', 18), bd=18)
+            label.bind('<Button-1>', lambda m=client_id: self.populate_method(m))
             label.pack()
 
         self.frame.bind('<Configure>', self.set_scrollregion)
@@ -294,10 +294,10 @@ class MainWindow(Frame):
         path = FOLDERPATH  # TODO: inserire il path
 
         u_frame = LabelFrame(t)
-        left = Label(u_frame, font=('lato', 18), text="User Profile -" + + client["Name"] + " " + client["surname"],
+        left = Label(u_frame, font=('lato', 18), text="User Profile -" + client["Name"] + " " + client["surname"],
                      bd=18)
         left.grid(row=2, column=2)
-        im = Image.open(os.path.join(path, client["_id"] + '.png'))
+        im = Image.open(os.path.join(path, str(client["_id"]) + '.png'))
         im = im.resize((200, 200), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
         label = Label(u_frame, image=photo)
@@ -317,7 +317,7 @@ class MainWindow(Frame):
                             anchor='w',
                             bd=18, justify="left")
         lbl_surname.pack()
-        lbl_age = Label(canvas1, font=('lato', 16), text="Age: " + get_field(client, 'age'), anchor='w', bd=18,
+        lbl_age = Label(canvas1, font=('lato', 16), text="Age: " + str(get_field(client, 'age')), anchor='w', bd=18,
                         justify="left")
         lbl_age.pack()
         lbl_gender = Label(canvas1, font=('lato', 16), text="Gender: " + get_field(client, 'gender'), anchor='w',
@@ -347,7 +347,7 @@ class MainWindow(Frame):
                                  anchor='w', bd=18, justify="left")
         lbl_drivingstyle.pack()
         lbl_seatincl = Label(canvas2, font=('lato', 16),
-                             text="Seat Inclination: " + get_field(client, 'seat_inclination'), anchor='w',
+                             text="Seat Inclination: " + str(get_field(client, 'seat_inclination')), anchor='w',
                              bd=18,
                              justify="left")
         lbl_seatincl.pack()
@@ -358,7 +358,7 @@ class MainWindow(Frame):
                            anchor='w', bd=18, justify="left")
         lbl_seator.pack()
         lbl_temp = Label(canvas3, font=('lato', 16),
-                         text="Temperature: " + get_field(client, 'temperature_level'),
+                         text="Temperature: " + str(get_field(client, 'temperature_level')),
                          anchor='w', bd=18, justify="left")
         lbl_temp.pack()
         lbl_lightlevel = Label(canvas3, font=('lato', 16),
