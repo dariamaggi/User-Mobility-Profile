@@ -117,7 +117,7 @@ class MainWindow(Frame):
         self.init_ui()
 
     def populate_method(self, method):
-        self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + method)
+        self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
         client = [client if client["_id"] == method else {} for client in self.users]
         self.open_profile(client)
 
@@ -133,7 +133,7 @@ class MainWindow(Frame):
         vbar.pack(side=RIGHT, fill=Y)
         vbar.config(command=self.canvas.yview)
         self.canvas.config(width=300, height=300)
-        self.canvas.config( yscrollcommand=vbar.set)
+        self.canvas.config(yscrollcommand=vbar.set)
 
         self.canvas.pack(side=TOP, expand=TRUE)
 
@@ -152,7 +152,6 @@ class MainWindow(Frame):
             button = Button(self.canvas, text=client_id, image=photo, compound="top",
                             command=lambda m=client_id: self.populate_method(m), font=('lato', 18), bd=18)
             button.pack()
-
 
         self.frame.bind('<Configure>', self.set_scrollregion)
 
@@ -286,12 +285,12 @@ class MainWindow(Frame):
 
     def open_profile(self, client):
         t = Toplevel(self)
-        t.wm_title("User Mobility Profile - " + client["name"] + " " + client["surname"])
+        t.wm_title("User Mobility Profile - " + client["Name"] + " " + client["surname"])
         t.geometry("760x660+250+300")
         path = FOLDERPATH  # TODO: inserire il path
 
         u_frame = LabelFrame(t)
-        left = Label(u_frame, font=('lato', 18), text="User Profile -" + + client["name"] + " " + client["surname"],
+        left = Label(u_frame, font=('lato', 18), text="User Profile -" + + client["Name"] + " " + client["surname"],
                      bd=18)
         left.grid(row=2, column=2)
         im = Image.open(os.path.join(path, client["_id"] + '.png'))
@@ -417,15 +416,14 @@ class MainWindow(Frame):
     def update_frame(self, client):
 
         get_image_by_id(client["_id"])
-        self.users.append(client)
 
         path = FOLDERPATH  # TODO: inserire il path
 
         im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        Button(self.canvas, text=client["_id"], image=photo, compound="top",
-                        command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
+        Button(self.canvas, text=client["_id"], compound="top",
+               command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
 
     def add_user(self, client):
         for item in self.users:
