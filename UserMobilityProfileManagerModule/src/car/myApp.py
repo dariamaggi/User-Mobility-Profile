@@ -110,6 +110,7 @@ class MainWindow(Frame):
     def __init__(self):
         super().__init__()
         self.canvas = Canvas(self.master)
+
         self.labelframe1 = LabelFrame(self.master)
         self.frame = Frame(self.canvas)
         self.users = []
@@ -124,8 +125,16 @@ class MainWindow(Frame):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def build_frames(self):
+
         left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18)
         left.pack()
+
+        vbar = Scrollbar(self.canvas, orient=VERTICAL)
+        vbar.pack(side=RIGHT, fill=Y)
+        vbar.config(command=self.canvas.yview)
+        self.canvas.config(width=300, height=300)
+        self.canvas.config( yscrollcommand=vbar.set)
+
         self.canvas.pack(side=TOP, expand=TRUE)
 
         i = 1
@@ -142,10 +151,9 @@ class MainWindow(Frame):
             photo = ImageTk.PhotoImage(im)
             button = Button(self.canvas, text=client_id, image=photo, compound="top",
                             command=lambda m=client_id: self.populate_method(m), font=('lato', 18), bd=18)
-            button.grid(row=i, column=2)
-            i += 1
+            button.pack()
 
-        self.canvas.create_window((0, 0), window=self.frame, anchor=NW)
+
         self.frame.bind('<Configure>', self.set_scrollregion)
 
         self.labelframe1.pack(expand="yes", fill=BOTH)
@@ -413,13 +421,11 @@ class MainWindow(Frame):
 
         path = FOLDERPATH  # TODO: inserire il path
 
-        i = 1
         im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        button = Button(self.canvas, text=client["_id"], image=photo, compound="top",
-                        command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18)
-        button.grid(row=i, column=2)
+        Button(self.canvas, text=client["_id"], image=photo, compound="top",
+                        command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
 
     def add_user(self, client):
         for item in self.users:
