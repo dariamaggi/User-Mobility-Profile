@@ -297,11 +297,13 @@ class MainWindow(Frame):
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + client["Name"] + " " + client["surname"],
                      bd=18)
         left.grid(row=2, column=2)
-        im = Image.open(os.path.join(path, str(client["_id"]) + '.png'))
-        im = im.resize((200, 200), Image.ANTIALIAS)
+
+        im = Image.open(os.path.join(path, client["_id"] + '.png'))
+        im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        label = Label(u_frame, image=photo)
-        label.grid(row=3, column=2)
+        canvas = Canvas(u_frame)
+        canvas.create_image(100,100, image=photo, anchor=NW)
+        canvas.grid(row=3, column=2)
 
         canvas1 = Canvas(u_frame)
 
@@ -309,7 +311,7 @@ class MainWindow(Frame):
         canvas1.grid(row=4, column=1, padx=10)
         # call procedure to populate canvas
 
-        lbl_name = Label(canvas1, font=('lato', 16), text="Name: " + get_field(client, 'name'), anchor='w',
+        lbl_name = Label(canvas1, font=('lato', 16), text="Name: " + get_field(client, 'Name'), anchor='w',
                          bd=18,
                          justify="left")
         lbl_name.pack()
