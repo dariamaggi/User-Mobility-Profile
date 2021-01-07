@@ -114,6 +114,7 @@ class MainWindow(Frame):
         self.frame = Frame(self.canvas)
         self.users = []
         self.init_ui()
+        self.i=1
 
     def populate_method(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + method)
@@ -128,7 +129,7 @@ class MainWindow(Frame):
         left.pack()
         self.canvas.pack(side=TOP, expand=TRUE)
 
-        i = 1
+
         # paths=FOLDERPATH
         # todo: attenzone a list_id --> client_id
         client_ids = [item["_id"] for item in self.users]
@@ -142,8 +143,8 @@ class MainWindow(Frame):
             photo = ImageTk.PhotoImage(im)
             button = Button(self.canvas, text=client_id, image=photo, compound="top",
                             command=lambda m=client_id: self.populate_method(m), font=('lato', 18), bd=18)
-            button.grid(row=i, column=2)
-            i += 1
+            button.grid(row=self.i, column=2)
+            self.i += 1
 
         self.canvas.create_window((0, 0), window=self.frame, anchor=NW)
         self.frame.bind('<Configure>', self.set_scrollregion)
@@ -423,13 +424,32 @@ class MainWindow(Frame):
                                                                          serv_list)).grid(
             row=2, column=3)
 
+    def update_frame(self, client):
+
+        get_image_by_id(client["_id"])
+        self.users.append(client)
+
+        path = FOLDERPATH  # TODO: inserire il path
+
+        im = Image.open(os.path.join(path, client["_id"] + '.png'))
+        im = im.resize((100, 100), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(im)
+        button = Button(self.canvas, text=client["_id"], image=photo, compound="top",
+                        command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18)
+        button.grid(row=self.i, column=2)
+        self.i += 1 #updates global row index
+
+
+
+
     def add_user(self, client):
         for item in self.users:
-            if client["_id"] is item["_id"]:  # todo: sbagliato
+            if client["_id"] is item["_id"]:
                 return False
         self.users.append(client)
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["name"] + " " + client[
             "surname"])
+        self.update_frame(client)
         return True
 
     def listbox_insert(self, value):
