@@ -301,9 +301,7 @@ class MainWindow(Frame):
         im = Image.open(os.path.join(path, client["_id"] + '.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        canvas = Canvas(u_frame)
-        canvas.create_image(100,100, image=photo, anchor=NW)
-        canvas.grid(row=3, column=2)
+        Label(u_frame, image=photo).grid(row=3, column=2)
 
         canvas1 = Canvas(u_frame)
 
