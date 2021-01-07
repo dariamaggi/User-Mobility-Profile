@@ -374,12 +374,12 @@ class MainWindow(Frame):
                                 anchor='w', bd=18, justify="left")
         lbl_musicvolume.pack()
         listbox_applications = Listbox(u_frame)
-        listbox_applications.pack()
+        listbox_applications.grid(row=5, column=2)
         for item in client["application_list"]:
             listbox_applications.insert(END, item)
 
         listbox_services = Listbox(u_frame)
-        listbox_services.pack()
+        listbox_services.grid(row=6, column=2)
 
         for item in client["service_list"]:
             listbox_services.insert(END, item)
