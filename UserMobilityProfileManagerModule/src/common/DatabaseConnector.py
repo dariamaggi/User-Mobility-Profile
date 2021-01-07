@@ -39,7 +39,7 @@ def read_all_from_ump(user_id, col):
 
 
 def modify_to_ump(user_id, col, field, value):
-    if field is 'image' or field is 'sound':
+    if field is 'image' or field is 'audio':
         return col.users.update_one({'_id': user_id},
                                     {'$push': {field: value}})
 
@@ -76,7 +76,10 @@ def read_images_by_id(db, user_id):
     if image_id is None:
         return 1
     for image in image_id['image']:
-        images.append(fs.get(image).read())
+        try:
+            images.append(fs.get(image).read())
+        except Exception:
+            print('Error to get image')
 
     return images
     return 1
@@ -86,10 +89,13 @@ def read_audios_by_id(db, user_id):
     audios = []
     fs = gridfs.GridFS(db)
     audio_id = read_field_from_ump(user_id, db, 'audio')
-    if audio_id is None:
+    if audio_id is []:
         return 1
     for audio in audio_id['audio']:
-        audios.append(fs.get(audio).read())
+        try:
+            audios.append(fs.get(audio).read())
+        except Exception:
+            print('Error to get audios')
 
     return audios
     return 1
@@ -129,13 +135,13 @@ def read_one_song_of_user(col, user_id):
 
 def read_all_images(col):
     users = col.users.find().distinct('_id')
-    counter = 0
     try:
         for user in users:
+            counter = 0
             images = read_images_by_id(col, user)
             for image in images:
                 if image != 1:
-                    output = open(os.path.join(setting['img_path'], str(user) + '_' + counter + '.png'), 'wb')
+                    output = open(os.path.join(setting['img_path'], str(user) + '_' + str(counter) + '.png'), 'wb')
                     output.write(image)
                     output.close()
                     counter = counter + 1
@@ -147,13 +153,13 @@ def read_all_images(col):
 
 def read_all_audios(col):
     users = col.users.find().distinct('_id')
-    counter = 0
     try:
         for user in users:
+            counter = 0
             audios = read_audios_by_id(col, user)
             for audio in audios:
                 if audio != 1:
-                    output = open(os.path.join(setting['sound_path'], str(user) + '_' + counter + '.wav'), 'wb')
+                    output = open(os.path.join(setting['sound_path'], str(user) + '_' + str(counter) + '.wav'), 'wb')
                     output.write(audio)
                     output.close()
                     counter = counter + 1
