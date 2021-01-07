@@ -114,7 +114,6 @@ class MainWindow(Frame):
         self.frame = Frame(self.canvas)
         self.users = []
         self.init_ui()
-        self.i=1
 
     def populate_method(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + method)
@@ -129,7 +128,7 @@ class MainWindow(Frame):
         left.pack()
         self.canvas.pack(side=TOP, expand=TRUE)
 
-
+        i = 1
         # paths=FOLDERPATH
         # todo: attenzone a list_id --> client_id
         client_ids = [item["_id"] for item in self.users]
@@ -138,13 +137,13 @@ class MainWindow(Frame):
         path = FOLDERPATH  # TODO: add path to folder
 
         for client_id in client_ids:
-            im = Image.open(os.path.join(path, client_id + '.png'))
+            im = Image.open(os.path.join(path, str(client_id) + '.png'))
             im = im.resize((100, 100), Image.ANTIALIAS)
             photo = ImageTk.PhotoImage(im)
             button = Button(self.canvas, text=client_id, image=photo, compound="top",
                             command=lambda m=client_id: self.populate_method(m), font=('lato', 18), bd=18)
-            button.grid(row=self.i, column=2)
-            self.i += 1
+            button.grid(row=i, column=2)
+            i += 1
 
         self.canvas.create_window((0, 0), window=self.frame, anchor=NW)
         self.frame.bind('<Configure>', self.set_scrollregion)
@@ -303,83 +302,66 @@ class MainWindow(Frame):
                          bd=18,
                          justify="left")
         lbl_name.pack()
-
         lbl_surname = Label(canvas1, font=('lato', 16), text="Surname: " + get_field(client, 'surname'),
                             anchor='w',
                             bd=18, justify="left")
         lbl_surname.pack()
-
         lbl_age = Label(canvas1, font=('lato', 16), text="Age: " + get_field(client, 'age'), anchor='w', bd=18,
                         justify="left")
         lbl_age.pack()
-
         lbl_gender = Label(canvas1, font=('lato', 16), text="Gender: " + get_field(client, 'gender'), anchor='w',
                            bd=18,
                            justify="left")
         lbl_gender.pack()
-
         lbl_country = Label(canvas1, font=('lato', 16), text="Country: " + get_field(client, 'country'),
                             anchor='w',
                             bd=18, justify="left")
         lbl_country.pack()
-
         canvas2 = Canvas(u_frame)
         canvas2.grid(row=4, column=2)
-
         lbl_homeloc = Label(canvas2, font=('lato', 16),
                             text="Home Location: " + get_field(client, 'home_location'),
                             anchor='w', bd=18, justify="left")
         lbl_homeloc.pack()
-
         lbl_jobloc = Label(canvas2, font=('lato', 16), text="Job Location: " + get_field(client, 'job_location'),
                            anchor='w', bd=18, justify="left")
         lbl_jobloc.pack()
-
         lbl_lochistory = Label(canvas2, font=('lato', 16),
                                text="Location History: " + get_field(client, 'location_history'), anchor='w',
                                bd=18,
                                justify="left")
         lbl_lochistory.pack()
-
         lbl_drivingstyle = Label(canvas2, font=('lato', 16),
                                  text="Driving Style: " + get_field(client, 'driving_style'),
                                  anchor='w', bd=18, justify="left")
         lbl_drivingstyle.pack()
-
         lbl_seatincl = Label(canvas2, font=('lato', 16),
                              text="Seat Inclination: " + get_field(client, 'seat_inclination'), anchor='w',
                              bd=18,
                              justify="left")
         lbl_seatincl.pack()
-
         canvas3 = Canvas(u_frame)
         canvas3.grid(row=4, column=3)
-
         lbl_seator = Label(canvas3, font=('lato', 16),
                            text="Seat Orientation: " + get_field(client, "seat_orientation"),
                            anchor='w', bd=18, justify="left")
         lbl_seator.pack()
-
         lbl_temp = Label(canvas3, font=('lato', 16),
                          text="Temperature: " + get_field(client, 'temperature_level'),
                          anchor='w', bd=18, justify="left")
         lbl_temp.pack()
-
         lbl_lightlevel = Label(canvas3, font=('lato', 16),
                                text="Light Level: " + get_field(client, 'light_level'),
                                anchor='w', bd=18, justify="left")
         lbl_lightlevel.pack()
-
         lbl_musicgenres = Label(canvas3, font=('lato', 16),
                                 text="Music Genres: " + get_field(client, 'music_genres'),
                                 anchor='w', bd=18, justify="left")
         lbl_musicgenres.pack()
-
         lbl_musicvolume = Label(canvas3, font=('lato', 16),
                                 text="Music Volume: " + get_field(client, 'music_volume'),
                                 anchor='w', bd=18, justify="left")
         lbl_musicvolume.pack()
-
         listbox_applications = Listbox(u_frame)
         listbox_applications.pack()
         for item in client["application_list"]:
@@ -431,25 +413,22 @@ class MainWindow(Frame):
 
         path = FOLDERPATH  # TODO: inserire il path
 
-        im = Image.open(os.path.join(path, client["_id"] + '.png'))
+        i = 1
+        im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
         button = Button(self.canvas, text=client["_id"], image=photo, compound="top",
                         command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18)
-        button.grid(row=self.i, column=2)
-        self.i += 1 #updates global row index
-
-
-
+        button.grid(row=i, column=2)
 
     def add_user(self, client):
         for item in self.users:
             if client["_id"] is item["_id"]:
                 return False
         self.users.append(client)
-        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["name"] + " " + client[
-            "surname"])
         self.update_frame(client)
+        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["Name"] + " " + client[
+            "surname"])
         return True
 
     def listbox_insert(self, value):
