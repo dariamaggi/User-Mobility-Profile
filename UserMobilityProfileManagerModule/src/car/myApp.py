@@ -118,7 +118,11 @@ class MainWindow(Frame):
 
     def populate_method(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
-        client = [client if client["_id"] == method else {} for client in self.users]
+        client = ""
+        for item in self.users:
+            if item["_id"]==method:
+                client=item
+                break
         self.open_profile(client)
 
     def set_scrollregion(self, event):
@@ -149,9 +153,9 @@ class MainWindow(Frame):
             im = Image.open(os.path.join(path, str(client_id) + '.png'))
             im = im.resize((100, 100), Image.ANTIALIAS)
             photo = ImageTk.PhotoImage(im)
-            button = Button(self.canvas, text=client_id, image=photo, compound="top",
-                            command=lambda m=client_id: self.populate_method(m), font=('lato', 18), bd=18)
-            button.pack()
+            label = Label(self.canvas, text=client_id, image=photo, compound="top"  , font=('lato', 18), bd=18)
+            label.bind('<Button-1>',lambda m=client_id: self.populate_method(m) )
+            label.pack()
 
         self.frame.bind('<Configure>', self.set_scrollregion)
 
