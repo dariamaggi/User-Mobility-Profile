@@ -376,9 +376,15 @@ class MainWindow(Frame):
                                 anchor='w', bd=18, justify="left")
         lbl_musicvolume.pack()
         listbox_applications = Listbox(u_frame)
+        Label(u_frame, font=('lato', 16),
+              text="Application List: " + get_field(client, 'music_volume'),
+              anchor='w', bd=18, justify="left").grid(row=5, column=1)
         listbox_applications.grid(row=5, column=2)
         for item in client["application_list"]:
             listbox_applications.insert(END, item)
+        Label(u_frame, font=('lato', 16),
+              text="Application List: " + get_field(client, 'music_volume'),
+              anchor='w', bd=18, justify="left").grid(row=6, column=1)
 
         listbox_services = Listbox(u_frame)
         listbox_services.grid(row=6, column=2)
