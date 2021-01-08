@@ -1,4 +1,6 @@
+import _thread
 import os
+import time
 from tkinter import *
 from tkinter import messagebox
 
@@ -9,7 +11,7 @@ from tkinter.messagebox import showinfo
 from json import loads
 from UserMobilityProfileMainClient import modify_fields_user, get_image_by_id
 
-FOLDERPATH = ''
+FOLDERPATH = ''  # todo:metti quì il path globale di files/photo
 
 
 def init_ui(info):
@@ -298,7 +300,7 @@ class MainWindow(Frame):
                      bd=18)
         left.grid(row=2, column=2)
 
-        im = Image.open(os.path.join(path, client["_id"] + '.png'))
+        im = Image.open(os.path.join(path, str(client["_id"]) + '.png'))
         photo = ImageTk.PhotoImage(im)
         Label(u_frame, image=photo).grid(row=3, column=2)
 
@@ -431,10 +433,11 @@ class MainWindow(Frame):
         im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-       # Label(self.canvas, image=photo)
+        # Label(self.canvas, image=photo)
         Button(self.canvas, text=client["Name"] + " " + client[
-            "surname"],  command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
-#image=photo, compound="top",
+            "surname"], command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
+
+    # image=photo, compound="top",
     def add_user(self, client):
         for item in self.users:
             if client["_id"] is item["_id"]:
@@ -449,12 +452,42 @@ class MainWindow(Frame):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ":" + value)
 
 
+def insert_user_in_gui_temp(app, client):
+    if not app.add_user(client):
+        return False
+    return True
+
+
+def pop(app):
+    user = {"_id": {"$oid": "5feda5026eb3e31c8d5e5643"}, "Name": "Andrea", "surname": "Chianese", "gender": "Male",
+            "age": 25, "country": "Italian", "home_location": "Pisa", "job_location": "test", "driving_style": "Sport",
+            "seat_inclination": 27, "seat_orientation": "Frontal", "temperature_level": 25, "light_level": "low",
+            "music_genres": "Metal", "music_volume": "moderate", "application_list": ["Facebook", "youtube"],
+            "service_list": ["Amazon prime", "Netflix"],
+            "image": [{"$oid": "5ff60477d7fd75b7f93f5f18"}, {"$oid": "5ff60477d7fd75b7f93f5f1a"}],
+            "audio": [{"$oid": "5ff6d4e796ec318243c153a7"}, {"$oid": "5ff6d4e796ec318243c153ac"},
+                      {"$oid": "5ff6da803d33a6b6865deb33"}]}
+
+    time.sleep(2)
+    print('pippo1')
+    try:
+        insert_user_in_gui_temp(app, user)
+        app.listbox_insert('Created client')
+    except:
+        print('Error')
+
+
 def main():
     root = Tk()
     root.geometry("560x560+300+300")
+    app = MainWindow()
 
-    app = MainWindow()  # todo: ricorda che devi chiamare il metodo di questa classe
-    root.mainloop()
+    _thread.start_new_thread(pop, (app,))
+
+    try:
+        root.mainloop()
+    except Exception:
+        print('error root')
 
 
 if __name__ == '__main__':
