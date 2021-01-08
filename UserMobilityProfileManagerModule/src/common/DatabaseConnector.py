@@ -1,11 +1,10 @@
 import configparser
 import os
-
-from pymongo import MongoClient
-from random import randint
-import gridfs
-
 from pathlib import Path
+from random import randint
+
+import gridfs
+from pymongo import MongoClient
 
 # prendere dati da config file
 config = configparser.ConfigParser()
@@ -39,7 +38,7 @@ def read_all_from_ump(user_id, col):
 
 
 def modify_to_ump(user_id, col, field, value):
-    if field is 'image' or field is 'audio':
+    if field == 'image' or field == 'audio':
         return col.users.update_one({'_id': user_id},
                                     {'$push': {field: value}})
 
@@ -98,7 +97,6 @@ def read_audios_by_id(db, user_id):
             print('Error to get audios')
 
     return audios
-    return 1
 
 
 def insert_file(db, file):
