@@ -1,16 +1,16 @@
+import json
+import logging
 import os
+import pathlib
+import socket  # Import socket module
 import threading
+import time
+import traceback
+import wave
 
 import pyaudio
-import wave
-import socket  # Import socket module
-import logging
-import time
-import pathlib
-from scipy.io.wavfile import read
-import traceback
-import json
 from picamera import PiCamera
+from scipy.io.wavfile import read
 
 form_1 = pyaudio.paInt16
 chans = 1
@@ -36,7 +36,9 @@ def get_photo():
         camera.capture(os.path.join(pathlib.Path(__file__), 'image.png'))
         # camera.stop_preview()
         data = open(os.path.join(pathlib.Path(__file__), 'image.png'))
+        start_time = time.time()
         user_id = request_user(counter, 'photo', data)
+        print("--- %s seconds ---" % (time.time() - start_time))
         time.sleep(10)
 
 
@@ -76,7 +78,9 @@ def get_audio():  # istanza pyaudio
         os.system("aplay" + wav_output_filename)
 
         data = read(os.path.join(pathlib.Path(__file__), wav_output_filename))
+        start_time = time.time()
         user_id = request_user(counter, 'song', data)
+        print("--- %s seconds ---" % (time.time() - start_time))
 
         time.sleep(10)
 
@@ -133,10 +137,10 @@ def recv(sock):
 def main():
     """Entry point for the application script"""
 
-    t1 = threading.Thread(target=get_audio())
+    t1 = threading.Thread(target=get_audio)
     t1.start
 
-    t2 = threading.Thread(target=get_photo())
+    t2 = threading.Thread(target=get_photo)
     t2.start
 
     print("Call your main application code here")
