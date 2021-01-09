@@ -39,10 +39,11 @@ FRAME_THICKNESS = 3
 FONT_THICKNESS = 2
 MODEL = 'hog'  # default: 'hog', other one can be 'cnn' - CUDA accelerated (if available) deep-learning pretrained model
 VEHICLE_IN_PORT = 65432
-VEHICLE_URL = '192.168.1.211'
+VEHICLE_URL = '192.168.3.72'
 
 CLOUD_IN_PORT = 55452
 CLOUD_URL = '192.168.1.211'
+
 
 def open_db():
     client = MongoClient(setting['mongo_con'])
@@ -525,10 +526,8 @@ def server_vehicle_recv(sensor_socket):
     logging.info("Vehicle - T_recv : data successfully parsed")
 
     response = recognize_user(request_id, data_type, data)
-    request_id = response[0]
-    user_id = response[1]
 
-    return_user_identifier(request_id, user_id, sensor_socket)
+    return_user_identifier(request_id, response, sensor_socket)
 
     sensor_socket.close()
     logging.info("Vehicle - T_recv : chiusura socket di comunicazione con il sensore " + str(sensor_socket))
@@ -548,12 +547,12 @@ def return_user_identifier(request_id, user_id, sensor_socket):
 
 vehicle_server = Server(VEHICLE_IN_PORT, "Vehicle - Main", server_vehicle_accept)
 
+
 # # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 #
 # # ++++++++++++++++++++++++++++++++ Logica di comunicazione veicolo - cloud ++++++++++++++++++++++++++
 #
-
 
 
 def request_remote_ump(inquiry_id, data_type, data):
@@ -1036,7 +1035,7 @@ def main():
     root.geometry("560x560+300+300")
     app_gui = MainWindow()
 
-    _thread.start_new_thread(vehicle_server, ())
+    vehicle_server.setup()
 
     try:
         root.mainloop()

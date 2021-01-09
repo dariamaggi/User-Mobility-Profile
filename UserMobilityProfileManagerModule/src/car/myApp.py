@@ -9,9 +9,11 @@ from PIL import Image as PImage
 import datetime
 from tkinter.messagebox import showinfo
 from json import loads
-from UserMobilityProfileMainClient import modify_fields_user, get_image_by_id
 
-FOLDERPATH = ''  # todo:metti quì il path globale di files/photo
+# from UserMobilityProfileManagerModule.src.car.UserMobilityProfileMainClient import modify_fields_user, get_image_by_id
+
+
+FOLDERPATH = '/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files/photos'
 
 
 def init_ui(info):
@@ -36,14 +38,16 @@ def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age,
          arg6, job_loc, arg7, app_list, arg8, serv_list, arg9):
     time = datetime.datetime.now()
     if len(arg1.get()) != 0:
-        result = modify_fields_user(id, "name", arg1.get())
+        # result = modify_fields_user(id, "name", arg1.get())
+        result = True
         if result:
             name.configure(text="Name: " + arg1.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
 
     if len(arg2.get()) != 0:
-        result = modify_fields_user(id, "surname", arg2.get())
+        # result = modify_fields_user(id, "surname", arg2.get())
+        result = True
         if result:
             surname.configure(text="Surname: " + arg2.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field surname: " + arg2.get())
@@ -52,7 +56,8 @@ def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age,
     if len(arg3.get()) != 0:
         try:
             int(str(arg3.get()))  # check if a number was actually entered
-            result = modify_fields_user(id, "age", arg3.get())
+            # result = modify_fields_user(id, "age", arg3.get())
+            result = True
             if result:
                 age.configure(text="Age: " + arg3.get())
                 listbox.insert(END, str(time) + ": updated profile " + user_id + " field age: " + arg3.get())
@@ -61,28 +66,32 @@ def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age,
             messagebox.showwarning(title=None, message="Age entered is not numeric.")
 
     if arg4.get() != "-":
-        result = modify_fields_user(id, "gender", arg4.get())
+        # result = modify_fields_user(id, "gender", arg4.get())
+        result = True
         if result:
             gender.configure(text="Gender: " + arg4.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
 
     if arg5.get() != "-":  # Country
-        result = modify_fields_user(id, "country", arg5.get())
+        # result = modify_fields_user(id, "country", arg5.get())
+        result = True
         if result:
             country.configure(text="Country: " + arg5.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
 
     if len(arg6.get()) != 0:  # home location
-        result = modify_fields_user(id, "home_location", arg6.get())
+        # result = modify_fields_user(id, "home_location", arg6.get())
+        result = True
         if result:
             home_loc.configure(text="Home Location: " + arg6.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
 
     if len(arg7.get()) != 0:  # job location
-        result = modify_fields_user(id, "job location", arg7.get())
+        # result = modify_fields_user(id, "job location", arg7.get())
+        result = True
         if result:
             job_loc.configure(text="Home Location: " + arg7.get())
 
@@ -93,7 +102,8 @@ def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age,
     if len(arg8.get()) != 0:
         new_elements = arg8.get().split(",")
 
-        result = modify_fields_user(id, "application_list", arg8.get())
+        # result = modify_fields_user(id, "application_list", arg8.get())
+        result = True
 
         if result:
             app_list = [app_list.delete(idx) for idx in range(app_list.size())]
@@ -117,6 +127,8 @@ class MainWindow(Frame):
         self.frame = Frame(self.canvas)
         self.users = []
         self.init_ui()
+        self.i = 0
+        self.images = []
 
     def populate_method(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
@@ -135,31 +147,18 @@ class MainWindow(Frame):
         left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18)
         left.pack()
 
-        vbar = Scrollbar(self.canvas, orient=VERTICAL)
-        vbar.pack(side=RIGHT, fill=Y)
-        vbar.config(command=self.canvas.yview)
+        #  vbar = Scrollbar(self.canvas, orient=VERTICAL)
+        # vbar.pack(side=RIGHT, fill=Y)
+        # vbar.config(command=self.canvas.yview)
         self.canvas.config(width=300, height=300)
-        self.canvas.config(yscrollcommand=vbar.set)
+        # self.canvas.config(yscrollcommand=vbar.set)
 
         self.canvas.pack(side=TOP, expand=TRUE)
 
         i = 1
-        # paths=FOLDERPATH
         # todo: attenzone a list_id --> client_id
-        client_ids = [item["_id"] for item in self.users]
-        [get_image_by_id(id) for id in client_ids]  # adds the images to the folder
 
-        path = FOLDERPATH  # TODO: add path to folder
-
-        for client_id in client_ids:
-            im = Image.open(os.path.join(path, str(client_id) + '.png'))
-            im = im.resize((100, 100), Image.ANTIALIAS)
-            photo = ImageTk.PhotoImage(im)
-            label = Label(self.canvas, text=client_id, image=photo, compound="top", font=('lato', 18), bd=18)
-            label.bind('<Button-1>', lambda m=client_id: self.populate_method(m))
-            label.pack()
-
-        self.frame.bind('<Configure>', self.set_scrollregion)
+        # self.frame.bind('<Configure>', self.set_scrollregion)
 
         self.labelframe1.pack(expand="yes", fill=BOTH)
         Label(self.labelframe1, text="Console Log", font=('lato', 18), bg="white", bd=18).pack()
@@ -257,25 +256,14 @@ class MainWindow(Frame):
         Label(u_frame, font=('lato', 16), text="Application List:", anchor='w', bd=18, justify="left").grid(row=row,
                                                                                                             column=1)
 
-        app_list_var = StringVar()
-
-        txt = Text(u_frame, textvariable=app_list_var)
-        for val in value["application_list"]:
-            txt.insert(END, val + ",")
-
         row += 1
         Label(u_frame, font=('lato', 16), text="Service List:", anchor='w', bd=18, justify="left").grid(row=row,
                                                                                                         column=1)
-
+        app_list_var = StringVar()
         serv_list_var = StringVar()
-
-        txt1 = Text(u_frame, textvariable=serv_list_var)
-        for val in value["application_list"]:
-            txt1.insert(END, val + ",")
-
         row += 1
 
-        Button(t, text="Submit",
+        Button(u_frame, text="Submit", font=('lato', 18), bd=18,
                command=lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
                               srnme=surname,
                               arg2=surname_var, age=age,
@@ -285,25 +273,22 @@ class MainWindow(Frame):
                               serv_list=serv_list, arg9=serv_list_var
                : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
                       arg2, age, arg3, gender, arg4, country, arg5,
-                      home_loc, arg6, job_loc, arg7, app_list, arg8, serv_list, arg9)).pack()
+                      home_loc, arg6, job_loc, arg7, app_list, arg8, serv_list, arg9)).grid(row=row,
+                                                                                            column=1)
 
-        Button(t, text="Close", command=t.destroy).pack()
+        Button(u_frame, text="Close", font=('lato', 18), bd=18, command=t.destroy).grid(row=row,
+                                                                                        column=2)
 
     def open_profile(self, client):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - " + client["Name"] + " " + client["surname"])
-        t.geometry("760x660+250+300")
-        path = FOLDERPATH  # TODO: inserire il path
+        t.geometry("760x960+150+300")
 
         u_frame = LabelFrame(t)
+
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + client["Name"] + " " + client["surname"],
                      bd=18)
         left.grid(row=2, column=2)
-
-        im = Image.open(os.path.join(path, str(client["_id"]) + '.png'))
-        photo = ImageTk.PhotoImage(im)
-        Label(u_frame, image=photo).grid(row=3, column=2)
-
         canvas1 = Canvas(u_frame)
 
         # id = client['_id']
@@ -375,17 +360,20 @@ class MainWindow(Frame):
                                 anchor='w', bd=18, justify="left")
         lbl_musicvolume.pack()
         listbox_applications = Listbox(u_frame)
+        listbox_applications.config(height=0)
         Label(u_frame, font=('lato', 16),
-              text="Application List: " + get_field(client, 'music_volume'),
+              text="Application List: ",
               anchor='w', bd=18, justify="left").grid(row=5, column=1)
         listbox_applications.grid(row=5, column=2)
         for item in client["application_list"]:
             listbox_applications.insert(END, item)
         Label(u_frame, font=('lato', 16),
-              text="Application List: " + get_field(client, 'music_volume'),
+              text="Application List: ",
               anchor='w', bd=18, justify="left").grid(row=6, column=1)
 
         listbox_services = Listbox(u_frame)
+        listbox_services.config(height=0)
+
         listbox_services.grid(row=6, column=2)
 
         for item in client["service_list"]:
@@ -408,7 +396,7 @@ class MainWindow(Frame):
         listbox1.pack(expand="yes", fill=BOTH)
 
         [listbox1.insert(END, " " + elem) for elem in self.listbox1.get(0, self.listbox1.size() - 1)]
-        Button(u_frame, text="Edit", font=('lato', 18),
+        Button(l_frame, text="Edit", font=('lato', 18),
                command=lambda name=lbl_name, surname=lbl_surname, age=lbl_age, gender=lbl_gender,
                               country=lbl_country, home_loc=lbl_homeloc, job_loc=lbl_jobloc,
                               app_list=listbox_applications,
@@ -421,23 +409,24 @@ class MainWindow(Frame):
                                                                          home_loc,
                                                                          job_loc,
                                                                          app_list,
-                                                                         serv_list)).grid(
-            row=2, column=3)
+                                                                         serv_list)).pack()
 
     def update_frame(self, client):
 
-        get_image_by_id(client["_id"])
+        # get_image_by_id(client["_id"])
 
         path = FOLDERPATH  # TODO: inserire il path
 
         im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        # Label(self.canvas, image=photo)
+        print("charging " + client['_id'])
         Button(self.canvas, text=client["Name"] + " " + client[
-            "surname"], command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
+            "surname"], image=photo, command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18),
+               bd=18).grid(row=1, column=self.i)
+        self.i += 1
+        self.images.append(photo)
 
-    # image=photo, compound="top",
     def add_user(self, client):
         for item in self.users:
             if client["_id"] is item["_id"]:
@@ -459,22 +448,27 @@ def insert_user_in_gui_temp(app, client):
 
 
 def pop(app):
-    user = {"_id": {"$oid": "5feda5026eb3e31c8d5e5643"}, "Name": "Andrea", "surname": "Chianese", "gender": "Male",
+    user = {"_id": "5feda5026eb3e31c8d5e5643", "Name": "Andrea", "surname": "Chianese", "gender": "Male",
             "age": 25, "country": "Italian", "home_location": "Pisa", "job_location": "test", "driving_style": "Sport",
             "seat_inclination": 27, "seat_orientation": "Frontal", "temperature_level": 25, "light_level": "low",
             "music_genres": "Metal", "music_volume": "moderate", "application_list": ["Facebook", "youtube"],
-            "service_list": ["Amazon prime", "Netflix"],
-            "image": [{"$oid": "5ff60477d7fd75b7f93f5f18"}, {"$oid": "5ff60477d7fd75b7f93f5f1a"}],
-            "audio": [{"$oid": "5ff6d4e796ec318243c153a7"}, {"$oid": "5ff6d4e796ec318243c153ac"},
-                      {"$oid": "5ff6da803d33a6b6865deb33"}]}
+            "service_list": ["Amazon prime", "Netflix"]}
+    user1 = {"_id": "photo", "Name": "Valerio", "surname": "Chianese", "gender": "Male",
+             "age": 25, "country": "Italian", "home_location": "Pisa", "job_location": "test", "driving_style": "Sport",
+             "seat_inclination": 27, "seat_orientation": "Frontal", "temperature_level": 25, "light_level": "low",
+             "music_genres": "Metal", "music_volume": "moderate", "application_list": ["Facebook", "youtube"],
+             "service_list": ["Amazon prime", "Netflix"]}
 
     time.sleep(2)
     print('pippo1')
     try:
+        insert_user_in_gui_temp(app, user1)
         insert_user_in_gui_temp(app, user)
+
         app.listbox_insert('Created client')
+
     except:
-        print('Error')
+        print('Errorino')
 
 
 def main():
