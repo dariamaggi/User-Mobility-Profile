@@ -1,5 +1,7 @@
+import base64
 import json
 import logging
+import _thread
 import os
 import pathlib
 import socket  # Import socket module
@@ -7,7 +9,7 @@ import threading
 import time
 import traceback
 import wave
-
+from ctypes import *
 import pyaudio
 from picamera import PiCamera
 from scipy.io.wavfile import read
@@ -24,31 +26,49 @@ VEHICLE_IN_PORT = 65432
 VEHICLE_URL = '192.168.1.211'
 MTU = 1024
 
+# $ grep -rn snd_lib_error_handler_t
+# Define our error handler type
+ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
+
+
+def py_error_handler(filename, line, function, err, fmt):
+    print('')
+
+
+c_error_handler = ERROR_HANDLER_FUNC(py_error_handler)
+
+asound = cdll.LoadLibrary('libasound.so')
+# Set error handler
+asound.snd_lib_error_set_handler(c_error_handler)
+
 
 def get_photo():
     camera = PiCamera()
     print('Start camera')
     counter = 0
-    while 1 == 1:
+    while True:
         counter = counter + 1
         # camera.start_preview()
         time.sleep(1)
-        camera.capture(os.path.join(pathlib.Path(__file__), 'image.png'))
+        name_photo = time.time()
+        camera.capture(os.path.join('/home/pi/Desktop/project/files/photo/temp', str(name_photo) + '_image.png'))
         # camera.stop_preview()
-        data = open(os.path.join(pathlib.Path(__file__), 'image.png'))
+        time.sleep(1)
+        data = open(os.path.join('/home/pi/Desktop/project/files/photo/temp', str(name_photo) + '_image.png'), 'rb')
+        data_byte = data.read()
         start_time = time.time()
-        user_id = request_user(counter, 'photo', data)
+        user_id = request_user(counter, 'photo', base64.encodebytes(data_byte).decode('utf-8'))
         print("--- %s seconds ---" % (time.time() - start_time))
-        time.sleep(10)
+        time.sleep(1)
+        os.remove(os.path.join('/home/pi/Desktop/project/files/photo/temp', str(name_photo) + '_image.png'))
 
 
 def get_audio():  # istanza pyaudio
     counter = 0
-    audio = pyaudio.PyAudio()
     print('start audio')
-    while 1 == 1:
+    while True:
+        audio = pyaudio.PyAudio()
         counter = counter + 1
-
         # setup audio input stream
         stream = audio.open(format=form_1, rate=samp_rate, channels=chans, input_device_index=dev_index, input=True,
                             frames_per_buffer=chunk)
@@ -67,22 +87,27 @@ def get_audio():  # istanza pyaudio
 
         # creates wave file with audio read in
         # Code is from the wave file audio tutorial as referenced below
-        wavefile = wave.open(wav_output_filename, 'wb')
+        name_audio = time.time()
+        wavefile = wave.open(
+            os.path.join('/home/pi/Desktop/project/files/sounds/temp', str(name_audio) + '_' + wav_output_filename),
+            'wb')
         wavefile.setnchannels(chans)
         wavefile.setsampwidth(audio.get_sample_size(form_1))
         wavefile.setframerate(samp_rate)
         wavefile.writeframes(b''.join(frames))
         wavefile.close()
 
-        # plays the audio file
-        os.system("aplay" + wav_output_filename)
-
-        data = read(os.path.join(pathlib.Path(__file__), wav_output_filename))
+        data = open(
+            os.path.join('/home/pi/Desktop/project/files/sounds/temp', str(name_audio) + '_' + wav_output_filename),
+            'rb')
+        data_byte = data.read()
         start_time = time.time()
-        user_id = request_user(counter, 'song', data)
+        user_id = request_user(counter, 'song', base64.encodebytes(data_byte).decode('utf-8'))
         print("--- %s seconds ---" % (time.time() - start_time))
-
-        time.sleep(10)
+        time.sleep(5)
+        os.remove(
+            os.path.join('/home/pi/Desktop/project/files/sounds/temp', str(name_audio) + '_' + wav_output_filename))
+        asound.snd_lib_error_set_handler(None)
 
 
 def request_user(request_id, data_type, data):
@@ -137,13 +162,11 @@ def recv(sock):
 def main():
     """Entry point for the application script"""
 
-    t1 = threading.Thread(target=get_audio)
-    t1.start
+    _thread.start_new_thread(get_audio, ())
 
-    t2 = threading.Thread(target=get_photo)
-    t2.start
+    _thread.start_new_thread(get_photo, ())
 
-    print("Call your main application code here")
+    print("thread starts")
 
 
 if __name__ == '__main__':

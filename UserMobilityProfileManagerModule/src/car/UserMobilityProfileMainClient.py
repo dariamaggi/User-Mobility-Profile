@@ -1,6 +1,5 @@
-import _thread
+import base64
 import time
-from pathlib import Path
 from tkinter import messagebox
 from tkinter.messagebox import showinfo
 import json
@@ -8,9 +7,8 @@ import socket
 import threading
 import traceback
 import datetime
-from tkinter import *
-
 import gridfs
+from tkinter import *
 from bson import ObjectId
 import configparser
 import logging
@@ -24,29 +22,29 @@ from pymongo import MongoClient
 
 # prendere dati da config file
 config = configparser.ConfigParser()
-path = Path(__file__).parent.parent.parent
-config.read(os.path.join(path, 'files', 'configurations.ini'))
+config.read(os.path.join('/home/pi/Desktop/project/Car controll', 'configurations.ini'))
 setting = config['settings']
 
 app_gui = ''
 MTU = 1024
-FOLDERPATH = setting['img_path']
 KNOWN_FACES_DIR = setting['img_path']
-UNKNOWN_DIR = setting['temp_path']
+UNKNOWN_FACES_DIR = setting['temp_photo_path']
 KNOWN_AUDIO_DIR = setting['sound_path']
+UNKNOWN_AUDIO_DIR = setting['temp_sounds_path']
+MONGOIP = setting['mongo_con']
 TOLERANCE = 0.6
 FRAME_THICKNESS = 3
 FONT_THICKNESS = 2
 MODEL = 'hog'  # default: 'hog', other one can be 'cnn' - CUDA accelerated (if available) deep-learning pretrained model
 VEHICLE_IN_PORT = 65432
-VEHICLE_URL = '192.168.3.72'
+VEHICLE_URL = '192.168.1.211'
 
 CLOUD_IN_PORT = 55452
 CLOUD_URL = '192.168.1.211'
 
 
 def open_db():
-    client = MongoClient(setting['mongo_con'])
+    client = MongoClient(MONGOIP)
     return client.UserProfileManagerDB
 
 
@@ -82,7 +80,7 @@ def modify_fields_user(user_id, field, value):
 def get_image_by_id(user_id):
     db = open_db()
     user_photo = read_one_image_of_user(db, user_id)
-    output = open(os.path.join(setting['img_path'], str(user_id) + '.png'), 'wb')
+    output = open(os.path.join(KNOWN_FACES_DIR, str(user_id) + '.png'), 'wb')
     output.write(user_photo)
     output.close()
 
@@ -107,10 +105,10 @@ def recognize_user(request_id, data_type, data):
         return None
 
     if data_type == 'song':
-        data_path = os.path.join(setting['temp_path'], 'temp' + '.wav')
+        data_path = os.path.join(UNKNOWN_AUDIO_DIR, 'temp' + '.wav')
         flag = 1
     elif data_type == 'photo':
-        data_path = os.path.join(setting['temp_path'], 'temp' + '.png')
+        data_path = os.path.join(UNKNOWN_FACES_DIR, 'temp' + '.png')
         flag = 0
     else:
         return False
@@ -126,7 +124,7 @@ def recognize_user(request_id, data_type, data):
         user = request_user_cloud(request_id, data_type, data)
         if user is None:
             logging.info('User is not identified on cloud, create temp user')
-            user = create_temp_user()
+            #user = create_temp_user()
         else:
             create_user(db, user)
     else:
@@ -171,7 +169,7 @@ def request_user_cloud(request_id, data_type, data):
 # Return ObjectId client or None
 # This function get the Unknown file on temp dir
 def identify_user(flag, db):
-    if os.listdir(UNKNOWN_DIR)[0] is None:
+    if os.listdir(UNKNOWN_FACES_DIR)[0] is None and os.listdir(UNKNOWN_AUDIO_DIR)[0] is None:
         logging.error('No file')
         return None
 
@@ -185,7 +183,7 @@ def identify_user(flag, db):
             return
         start_time = time.time()
         for filename in os.listdir(KNOWN_AUDIO_DIR):
-            res = match_audio(os.path.join(UNKNOWN_DIR, os.listdir(UNKNOWN_DIR)[0]),
+            res = match_audio(os.path.join(UNKNOWN_AUDIO_DIR, os.listdir(UNKNOWN_AUDIO_DIR)[0]),
                               os.path.join(KNOWN_AUDIO_DIR, filename))
             if res != 0:
                 temp_res.append({'song': filename, 'res': res})
@@ -264,10 +262,10 @@ def search_face():
 
     print('Processing unknown faces...')
     # Now let's loop over a folder of faces we want to label
-    for filename in os.listdir(UNKNOWN_DIR):
+    for filename in os.listdir(UNKNOWN_FACES_DIR):
         # Load image
         print(f'Unknown Faces: Filename {filename}', end='')
-        image = face_recognition.load_image_file(f'{UNKNOWN_DIR}/{filename}')
+        image = face_recognition.load_image_file(f'{UNKNOWN_FACES_DIR}/{filename}')
 
         # This time we first grab face locations - we'll need them to draw boxes
         locations = face_recognition.face_locations(image, model=MODEL)
@@ -327,10 +325,6 @@ def modify_to_ump(user_id, col, field, value):
 
 def read_all_users(col):
     return col.users.find({})
-
-
-def insert_user(col, value):  # todo: dovrebbe essere chiamato ?!?!?!
-    return col.users.insert_one(value)  # Return the ID
 
 
 def read_images_by_id(db, user_id):
@@ -395,7 +389,7 @@ def read_all_images(col):
             images = read_images_by_id(col, user)
             for image in images:
                 if image != 1:
-                    output = open(os.path.join(setting['img_path'], str(user) + '_' + str(counter) + '.png'), 'wb')
+                    output = open(os.path.join(KNOWN_FACES_DIR, str(user) + '_' + str(counter) + '.png'), 'wb')
                     output.write(image)
                     output.close()
                     counter = counter + 1
@@ -413,7 +407,7 @@ def read_all_audios(col):
             audios = read_audios_by_id(col, user)
             for audio in audios:
                 if audio != 1:
-                    output = open(os.path.join(setting['sound_path'], str(user) + '_' + str(counter) + '.wav'), 'wb')
+                    output = open(os.path.join(KNOWN_AUDIO_DIR, str(user) + '_' + str(counter) + '.wav'), 'wb')
                     output.write(audio)
                     output.close()
                     counter = counter + 1
@@ -525,9 +519,9 @@ def server_vehicle_recv(sensor_socket):
 
     logging.info("Vehicle - T_recv : data successfully parsed")
 
-    response = recognize_user(request_id, data_type, data)
+    user_id = recognize_user(request_id, data_type, base64.decodebytes(data.encode()))
 
-    return_user_identifier(request_id, response, sensor_socket)
+    return_user_identifier(request_id, user_id, sensor_socket)
 
     sensor_socket.close()
     logging.info("Vehicle - T_recv : chiusura socket di comunicazione con il sensore " + str(sensor_socket))
@@ -609,8 +603,7 @@ class UserProfile(Frame):
 
 
 def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age, arg3, gender, arg4, country, arg5,
-         home_loc,
-         arg6, job_loc, arg7, app_list, arg8, serv_list, arg9):
+         home_loc, arg6, job_loc, arg7):
     time = datetime.datetime.now()
     if len(arg1.get()) != 0:
         result = modify_fields_user(id, "name", arg1.get())
@@ -667,16 +660,6 @@ def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age,
             main_listbox.insert(END,
                                 str(time) + ": updated profile " + user_id + " field job location: " + arg7.get())
 
-    if len(arg8.get()) != 0:
-        new_elements = arg8.get().split(",")
-
-        result = modify_fields_user(id, "application_list", arg8.get())
-
-        if result:
-            app_list = [app_list.delete(idx) for idx in range(app_list.size())]
-            for new_item in new_elements:
-                app_list.insert(END, new_item)
-
 
 def get_field(client, field):
     if field in client.keys():
@@ -694,6 +677,8 @@ class MainWindow(Frame):
         self.frame = Frame(self.canvas)
         self.users = []
         self.init_ui()
+        self.i = 0
+        self.images = []
 
     def populate_method(self, method):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
@@ -712,31 +697,10 @@ class MainWindow(Frame):
         left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18)
         left.pack()
 
-        vbar = Scrollbar(self.canvas, orient=VERTICAL)
-        vbar.pack(side=RIGHT, fill=Y)
-        vbar.config(command=self.canvas.yview)
         self.canvas.config(width=300, height=300)
-        self.canvas.config(yscrollcommand=vbar.set)
-
         self.canvas.pack(side=TOP, expand=TRUE)
 
-        i = 1
-        # paths=FOLDERPATH
         # todo: attenzone a list_id --> client_id
-        client_ids = [item["_id"] for item in self.users]
-        [get_image_by_id(id) for id in client_ids]  # adds the images to the folder
-
-        path = FOLDERPATH  # TODO: add path to folder
-
-        for client_id in client_ids:
-            im = Image.open(os.path.join(path, str(client_id) + '.png'))
-            im = im.resize((100, 100), Image.ANTIALIAS)
-            photo = ImageTk.PhotoImage(im)
-            label = Label(self.canvas, text=client_id, image=photo, compound="top", font=('lato', 18), bd=18)
-            label.bind('<Button-1>', lambda m=client_id: self.populate_method(m))
-            label.pack()
-
-        self.frame.bind('<Configure>', self.set_scrollregion)
 
         self.labelframe1.pack(expand="yes", fill=BOTH)
         Label(self.labelframe1, text="Console Log", font=('lato', 18), bg="white", bd=18).pack()
@@ -768,10 +732,10 @@ class MainWindow(Frame):
     def on_exit(self):
         self.quit()
 
-    def open_edit(self, value, listbox, name, surname, age, gender, country, home_loc, job_loc, app_list, serv_list):
+    def open_edit(self, value, listbox, name, surname, age, gender, country, home_loc, job_loc):
         t = Toplevel(self)
         t.wm_title("Edit Profile")
-        t.geometry("400x560+300+300")
+        t.geometry("600x700++300+300")
         Label(t, font=('lato', 20), text="Edit profile", bd=18, justify="left").pack()
 
         u_frame = Frame(t)
@@ -815,13 +779,10 @@ class MainWindow(Frame):
         country_var = StringVar()
         country_var.set("-")
         choice = ['Austria', 'Colombia', 'Italia']
-
         Label(u_frame, font=('lato', 16), text="Country:", anchor='w', bd=18, justify="left").grid(row=row, column=1)
         OptionMenu(u_frame, country_var, *choice).grid(row=row, column=2)
-
         home_loc_var = StringVar()
         job_loc_var = StringVar()
-
         Label(u_frame, font=('lato', 16), text="Home location:", anchor='w', bd=18, justify="left").grid(row=row,
                                                                                                          column=1)
         Entry(u_frame, textvariable=home_loc_var, ).grid(row=row, column=2)
@@ -830,57 +791,34 @@ class MainWindow(Frame):
         Label(u_frame, font=('lato', 16), text="Job location:", anchor='w', bd=18, justify="left").grid(row=row,
                                                                                                         column=1)
         Entry(u_frame, textvariable=job_loc_var, ).grid(row=row, column=2)
-        row += 1
-        Label(u_frame, font=('lato', 16), text="Application List:", anchor='w', bd=18, justify="left").grid(row=row,
-                                                                                                            column=1)
-
-        app_list_var = StringVar()
-
-        txt = Text(u_frame, textvariable=app_list_var)
-        for val in value["application_list"]:
-            txt.insert(END, val + ",")
-
-        row += 1
-        Label(u_frame, font=('lato', 16), text="Service List:", anchor='w', bd=18, justify="left").grid(row=row,
-                                                                                                        column=1)
-
-        serv_list_var = StringVar()
-
-        txt1 = Text(u_frame, textvariable=serv_list_var)
-        for val in value["application_list"]:
-            txt1.insert(END, val + ",")
 
         row += 1
 
-        Button(t, text="Submit",
+        Button(u_frame, text="Submit", font=('lato', 18), bd=18,
                command=lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
                               srnme=surname,
                               arg2=surname_var, age=age,
                               arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
                               home_loc=home_loc, arg6=home_loc_var,
-                              job_loc=job_loc, arg7=job_loc_var, app_list=app_list, arg8=app_list_var,
-                              serv_list=serv_list, arg9=serv_list_var
+                              job_loc=job_loc, arg7=job_loc_var
                : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
                       arg2, age, arg3, gender, arg4, country, arg5,
-                      home_loc, arg6, job_loc, arg7, app_list, arg8, serv_list, arg9)).pack()
+                      home_loc, arg6, job_loc, arg7)).grid(row=row,
+                                                           column=1)
 
-        Button(t, text="Close", command=t.destroy).pack()
+        Button(u_frame, text="Close", font=('lato', 18), bd=18, command=t.destroy).grid(row=row,
+                                                                                        column=2)
 
     def open_profile(self, client):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - " + client["Name"] + " " + client["surname"])
-        t.geometry("760x660+250+300")
-        path = FOLDERPATH  # TODO: inserire il path
+        t.geometry("760x960+150+300")
 
         u_frame = LabelFrame(t)
+
         left = Label(u_frame, font=('lato', 18), text="User Profile -" + client["Name"] + " " + client["surname"],
                      bd=18)
         left.grid(row=2, column=2)
-
-        im = Image.open(os.path.join(path, str(client["_id"]) + '.png'))
-        photo = ImageTk.PhotoImage(im)
-        Label(u_frame, image=photo).grid(row=3, column=2)
-
         canvas1 = Canvas(u_frame)
 
         # id = client['_id']
@@ -952,17 +890,20 @@ class MainWindow(Frame):
                                 anchor='w', bd=18, justify="left")
         lbl_musicvolume.pack()
         listbox_applications = Listbox(u_frame)
+        listbox_applications.config(height=0)
         Label(u_frame, font=('lato', 16),
-              text="Application List: " + get_field(client, 'music_volume'),
+              text="Application List: ",
               anchor='w', bd=18, justify="left").grid(row=5, column=1)
         listbox_applications.grid(row=5, column=2)
         for item in client["application_list"]:
             listbox_applications.insert(END, item)
         Label(u_frame, font=('lato', 16),
-              text="Application List: " + get_field(client, 'music_volume'),
+              text="Application List: ",
               anchor='w', bd=18, justify="left").grid(row=6, column=1)
 
         listbox_services = Listbox(u_frame)
+        listbox_services.config(height=0)
+
         listbox_services.grid(row=6, column=2)
 
         for item in client["service_list"]:
@@ -985,7 +926,7 @@ class MainWindow(Frame):
         listbox1.pack(expand="yes", fill=BOTH)
 
         [listbox1.insert(END, " " + elem) for elem in self.listbox1.get(0, self.listbox1.size() - 1)]
-        Button(u_frame, text="Edit", font=('lato', 18),
+        Button(l_frame, text="Edit", font=('lato', 18),
                command=lambda name=lbl_name, surname=lbl_surname, age=lbl_age, gender=lbl_gender,
                               country=lbl_country, home_loc=lbl_homeloc, job_loc=lbl_jobloc,
                               app_list=listbox_applications,
@@ -996,32 +937,27 @@ class MainWindow(Frame):
                                                                          age, gender,
                                                                          country,
                                                                          home_loc,
-                                                                         job_loc,
-                                                                         app_list,
-                                                                         serv_list)).grid(
-            row=2, column=3)
+                                                                         job_loc)).pack()
 
     def update_frame(self, client):
 
-        get_image_by_id(client["_id"])
-
-        path = FOLDERPATH  # TODO: inserire il path
-
-        im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
+        im = Image.open(os.path.join(KNOWN_FACES_DIR, str(client['_id']) + '_0.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        # Label(self.canvas, image=photo)
+        print("charging " + client['_id'])
         Button(self.canvas, text=client["Name"] + " " + client[
-            "surname"], command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18), bd=18).pack()
+            "surname"], image=photo, command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18),
+               bd=18).grid(row=1, column=self.i)
+        self.i += 1
+        self.images.append(photo)
 
-    # image=photo, compound="top",
-    def add_user(self, client):
+    def add_user(self, user):
         for item in self.users:
-            if client["_id"] is item["_id"]:
+            if user["_id"] is item["_id"]:
                 return False
-        self.users.append(client)
-        self.update_frame(client)
-        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["Name"] + " " + client[
+        self.users.append(user)
+        self.update_frame(user)
+        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + user["Name"] + " " + user[
             "surname"])
         return True
 
