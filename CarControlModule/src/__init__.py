@@ -22,8 +22,8 @@ record_secs = 5  # record time
 dev_index = 2
 wav_output_filename = 'audio.wav'
 
-VEHICLE_IN_PORT = 65432
-VEHICLE_URL = '192.168.1.211'
+VEHICLE_IN_PORT = 65430
+VEHICLE_URL = '127.0.1.1'
 MTU = 1024
 
 # $ grep -rn snd_lib_error_handler_t
@@ -47,20 +47,22 @@ def get_photo():
     print('Start camera')
     counter = 0
     while True:
+        camera.resolution = (720, 576)
         counter = counter + 1
-        # camera.start_preview()
-        time.sleep(1)
+        camera.start_preview()
         name_photo = time.time()
-        camera.capture(os.path.join('/home/pi/Desktop/project/files/photo/temp', str(name_photo) + '_image.png'))
-        # camera.stop_preview()
-        time.sleep(1)
-        data = open(os.path.join('/home/pi/Desktop/project/files/photo/temp', str(name_photo) + '_image.png'), 'rb')
+        print('Capture photo')
+        camera.capture(os.path.join('/home/pi/Desktop/project/files/photo/temp_sensor', str(name_photo) + '_image.png'))
+        camera.stop_preview()
+        data = open(os.path.join('/home/pi/Desktop/project/files/photo/temp_sensor', str(name_photo) + '_image.png'),
+                    'rb')
         data_byte = data.read()
         start_time = time.time()
+        print('Start connection')
         user_id = request_user(counter, 'photo', base64.encodebytes(data_byte).decode('utf-8'))
         print("--- %s seconds ---" % (time.time() - start_time))
-        time.sleep(1)
-        os.remove(os.path.join('/home/pi/Desktop/project/files/photo/temp', str(name_photo) + '_image.png'))
+        time.sleep(30)
+        os.remove(os.path.join('/home/pi/Desktop/project/files/photo/temp_sensor', str(name_photo) + '_image.png'))
 
 
 def get_audio():  # istanza pyaudio
@@ -72,7 +74,7 @@ def get_audio():  # istanza pyaudio
         # setup audio input stream
         stream = audio.open(format=form_1, rate=samp_rate, channels=chans, input_device_index=dev_index, input=True,
                             frames_per_buffer=chunk)
-        print("recording")
+        print("recording\n")
         frames = []
 
         for ii in range(0, int((samp_rate / chunk) * record_secs)):
@@ -89,7 +91,8 @@ def get_audio():  # istanza pyaudio
         # Code is from the wave file audio tutorial as referenced below
         name_audio = time.time()
         wavefile = wave.open(
-            os.path.join('/home/pi/Desktop/project/files/sounds/temp', str(name_audio) + '_' + wav_output_filename),
+            os.path.join('/home/pi/Desktop/project/files/sounds/temp_sensor',
+                         str(name_audio) + '_' + wav_output_filename),
             'wb')
         wavefile.setnchannels(chans)
         wavefile.setsampwidth(audio.get_sample_size(form_1))
@@ -98,7 +101,8 @@ def get_audio():  # istanza pyaudio
         wavefile.close()
 
         data = open(
-            os.path.join('/home/pi/Desktop/project/files/sounds/temp', str(name_audio) + '_' + wav_output_filename),
+            os.path.join('/home/pi/Desktop/project/files/sounds/temp_sensor',
+                         str(name_audio) + '_' + wav_output_filename),
             'rb')
         data_byte = data.read()
         start_time = time.time()
@@ -106,7 +110,8 @@ def get_audio():  # istanza pyaudio
         print("--- %s seconds ---" % (time.time() - start_time))
         time.sleep(5)
         os.remove(
-            os.path.join('/home/pi/Desktop/project/files/sounds/temp', str(name_audio) + '_' + wav_output_filename))
+            os.path.join('/home/pi/Desktop/project/files/sounds/temp_sensor',
+                         str(name_audio) + '_' + wav_output_filename))
         asound.snd_lib_error_set_handler(None)
 
 
@@ -159,8 +164,20 @@ def recv(sock):
     return res
 
 
+def clean_folder():
+    for f in os.listdir('/home/pi/Desktop/project/files/photo/temp_sensor'):
+        os.remove(os.path.join('/home/pi/Desktop/project/files/photo/temp_sensor', f))
+
+    for f in os.listdir('/home/pi/Desktop/project/files/sounds/temp_sensor'):
+        os.remove(os.path.join('/home/pi/Desktop/project/files/sounds/temp_sensor', f))
+
+    print('Clean all folder')
+
+
 def main():
     """Entry point for the application script"""
+
+    clean_folder()
 
     _thread.start_new_thread(get_audio, ())
 
