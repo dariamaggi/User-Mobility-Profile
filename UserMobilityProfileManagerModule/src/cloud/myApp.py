@@ -11,10 +11,11 @@ from tkinter.messagebox import showinfo
 from json import loads
 
 # from UserMobilityProfileManagerModule.src.car.UserMobilityProfileMainClient import modify_fields_user, get_image_by_id
+from bson import ObjectId
 
+from cloud import modify_fields_user
 
-FOLDERPATH = '/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files/photos'
-
+KNOWN_FACES_DIR = '/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files/photos'
 
 def init_ui(info):
     print(info)
@@ -34,20 +35,17 @@ class UserProfile(Frame):
 
 
 def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age, arg3, gender, arg4, country, arg5,
-         home_loc,
-         arg6, job_loc, arg7, app_list, arg8, serv_list, arg9):
+         home_loc, arg6, job_loc, arg7):
     time = datetime.datetime.now()
     if len(arg1.get()) != 0:
-        # result = modify_fields_user(id, "name", arg1.get())
-        result = True
+        result = modify_fields_user(id, "name", arg1.get())
         if result:
             name.configure(text="Name: " + arg1.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
 
     if len(arg2.get()) != 0:
-        # result = modify_fields_user(id, "surname", arg2.get())
-        result = True
+        result = modify_fields_user(id, "surname", arg2.get())
         if result:
             surname.configure(text="Surname: " + arg2.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field surname: " + arg2.get())
@@ -56,8 +54,7 @@ def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age,
     if len(arg3.get()) != 0:
         try:
             int(str(arg3.get()))  # check if a number was actually entered
-            # result = modify_fields_user(id, "age", arg3.get())
-            result = True
+            result = modify_fields_user(id, "age", arg3.get())
             if result:
                 age.configure(text="Age: " + arg3.get())
                 listbox.insert(END, str(time) + ": updated profile " + user_id + " field age: " + arg3.get())
@@ -66,49 +63,34 @@ def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age,
             messagebox.showwarning(title=None, message="Age entered is not numeric.")
 
     if arg4.get() != "-":
-        # result = modify_fields_user(id, "gender", arg4.get())
-        result = True
+        result = modify_fields_user(id, "gender", arg4.get())
         if result:
             gender.configure(text="Gender: " + arg4.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
 
     if arg5.get() != "-":  # Country
-        # result = modify_fields_user(id, "country", arg5.get())
-        result = True
+        result = modify_fields_user(id, "country", arg5.get())
         if result:
             country.configure(text="Country: " + arg5.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
 
     if len(arg6.get()) != 0:  # home location
-        # result = modify_fields_user(id, "home_location", arg6.get())
-        result = True
+        result = modify_fields_user(id, "home_location", arg6.get())
         if result:
             home_loc.configure(text="Home Location: " + arg6.get())
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
             main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
 
     if len(arg7.get()) != 0:  # job location
-        # result = modify_fields_user(id, "job location", arg7.get())
-        result = True
+        result = modify_fields_user(id, "job location", arg7.get())
         if result:
             job_loc.configure(text="Home Location: " + arg7.get())
 
             listbox.insert(END, str(time) + ": updated profile " + user_id + " field job location: " + arg7.get())
             main_listbox.insert(END,
                                 str(time) + ": updated profile " + user_id + " field job location: " + arg7.get())
-
-    if len(arg8.get()) != 0:
-        new_elements = arg8.get().split(",")
-
-        # result = modify_fields_user(id, "application_list", arg8.get())
-        result = True
-
-        if result:
-            app_list = [app_list.delete(idx) for idx in range(app_list.size())]
-            for new_item in new_elements:
-                app_list.insert(END, new_item)
 
 
 def get_field(client, field):
@@ -134,7 +116,7 @@ class MainWindow(Frame):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
         client = ""
         for item in self.users:
-            if item["_id"] == method:
+            if item["_id"] == ObjectId(method):
                 client = item
                 break
         self.open_profile(client)
@@ -147,18 +129,10 @@ class MainWindow(Frame):
         left = Label(self.master, font=('lato', 18), text="Currently Loaded User Mobility Profiles", bd=18)
         left.pack()
 
-        #  vbar = Scrollbar(self.canvas, orient=VERTICAL)
-        # vbar.pack(side=RIGHT, fill=Y)
-        # vbar.config(command=self.canvas.yview)
         self.canvas.config(width=300, height=300)
-        # self.canvas.config(yscrollcommand=vbar.set)
-
         self.canvas.pack(side=TOP, expand=TRUE)
 
-        i = 1
         # todo: attenzone a list_id --> client_id
-
-        # self.frame.bind('<Configure>', self.set_scrollregion)
 
         self.labelframe1.pack(expand="yes", fill=BOTH)
         Label(self.labelframe1, text="Console Log", font=('lato', 18), bg="white", bd=18).pack()
@@ -190,10 +164,10 @@ class MainWindow(Frame):
     def on_exit(self):
         self.quit()
 
-    def open_edit(self, value, listbox, name, surname, age, gender, country, home_loc, job_loc, app_list, serv_list):
+    def open_edit(self, value, listbox, name, surname, age, gender, country, home_loc, job_loc):
         t = Toplevel(self)
         t.wm_title("Edit Profile")
-        t.geometry("400x560+300+300")
+        t.geometry("600x700+300+300")
         Label(t, font=('lato', 20), text="Edit profile", bd=18, justify="left").pack()
 
         u_frame = Frame(t)
@@ -237,13 +211,10 @@ class MainWindow(Frame):
         country_var = StringVar()
         country_var.set("-")
         choice = ['Austria', 'Colombia', 'Italia']
-
         Label(u_frame, font=('lato', 16), text="Country:", anchor='w', bd=18, justify="left").grid(row=row, column=1)
         OptionMenu(u_frame, country_var, *choice).grid(row=row, column=2)
-
         home_loc_var = StringVar()
         job_loc_var = StringVar()
-
         Label(u_frame, font=('lato', 16), text="Home location:", anchor='w', bd=18, justify="left").grid(row=row,
                                                                                                          column=1)
         Entry(u_frame, textvariable=home_loc_var, ).grid(row=row, column=2)
@@ -252,15 +223,7 @@ class MainWindow(Frame):
         Label(u_frame, font=('lato', 16), text="Job location:", anchor='w', bd=18, justify="left").grid(row=row,
                                                                                                         column=1)
         Entry(u_frame, textvariable=job_loc_var, ).grid(row=row, column=2)
-        row += 1
-        Label(u_frame, font=('lato', 16), text="Application List:", anchor='w', bd=18, justify="left").grid(row=row,
-                                                                                                            column=1)
 
-        row += 1
-        Label(u_frame, font=('lato', 16), text="Service List:", anchor='w', bd=18, justify="left").grid(row=row,
-                                                                                                        column=1)
-        app_list_var = StringVar()
-        serv_list_var = StringVar()
         row += 1
 
         Button(u_frame, text="Submit", font=('lato', 18), bd=18,
@@ -269,12 +232,11 @@ class MainWindow(Frame):
                               arg2=surname_var, age=age,
                               arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
                               home_loc=home_loc, arg6=home_loc_var,
-                              job_loc=job_loc, arg7=job_loc_var, app_list=app_list, arg8=app_list_var,
-                              serv_list=serv_list, arg9=serv_list_var
+                              job_loc=job_loc, arg7=job_loc_var
                : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
                       arg2, age, arg3, gender, arg4, country, arg5,
-                      home_loc, arg6, job_loc, arg7, app_list, arg8, serv_list, arg9)).grid(row=row,
-                                                                                            column=1)
+                      home_loc, arg6, job_loc, arg7)).grid(row=row,
+                                                           column=1)
 
         Button(u_frame, text="Close", font=('lato', 18), bd=18, command=t.destroy).grid(row=row,
                                                                                         column=2)
@@ -407,33 +369,27 @@ class MainWindow(Frame):
                                                                          age, gender,
                                                                          country,
                                                                          home_loc,
-                                                                         job_loc,
-                                                                         app_list,
-                                                                         serv_list)).pack()
+                                                                         job_loc)).pack()
 
     def update_frame(self, client):
 
-        # get_image_by_id(client["_id"])
-
-        path = FOLDERPATH  # TODO: inserire il path
-
-        im = Image.open(os.path.join(path, str(client['_id']) + '.png'))
+        im = Image.open(os.path.join(KNOWN_FACES_DIR, str(client['_id']) + '_0.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        print("charging " + client['_id'])
+        print("charging " + str(client['_id']))
         Button(self.canvas, text=client["Name"] + " " + client[
-            "surname"], image=photo, command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18),
+            "surname"], image=photo, command=lambda m=str(client["_id"]): self.populate_method(m), font=('lato', 18),
                bd=18).grid(row=1, column=self.i)
         self.i += 1
         self.images.append(photo)
 
-    def add_user(self, client):
+    def add_user(self, user):
         for item in self.users:
-            if client["_id"] is item["_id"]:
+            if user["_id"] is item["_id"]:
                 return False
-        self.users.append(client)
-        self.update_frame(client)
-        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + client["Name"] + " " + client[
+        self.users.append(user)
+        self.update_frame(user)
+        self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + user["Name"] + " " + user[
             "surname"])
         return True
 
@@ -448,7 +404,7 @@ def insert_user_in_gui_temp(app, client):
 
 
 def pop(app):
-    user = {"_id": "5feda5026eb3e31c8d5e5643", "Name": "Andrea", "surname": "Chianese", "gender": "Male",
+    user = {"_id": ObjectId("5feda5026eb3e31c8d5e5643"), "Name": "Andrea", "surname": "Chianese", "gender": "Male",
             "age": 25, "country": "Italian", "home_location": "Pisa", "job_location": "test", "driving_style": "Sport",
             "seat_inclination": 27, "seat_orientation": "Frontal", "temperature_level": 25, "light_level": "low",
             "music_genres": "Metal", "music_volume": "moderate", "application_list": ["Facebook", "youtube"],
@@ -462,7 +418,6 @@ def pop(app):
     time.sleep(2)
     print('pippo1')
     try:
-        insert_user_in_gui_temp(app, user1)
         insert_user_in_gui_temp(app, user)
 
         app.listbox_insert('Created client')
