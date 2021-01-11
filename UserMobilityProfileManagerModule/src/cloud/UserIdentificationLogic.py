@@ -1,3 +1,4 @@
+import time
 from bson import ObjectId
 from common.DatabaseConnector import *
 import configparser
@@ -11,12 +12,14 @@ from fuzzywuzzy import fuzz
 
 config = configparser.ConfigParser()
 path = Path(__file__).parent.parent.parent
-config.read(os.path.join(path, 'files', '../../files/configurations.ini'))
+config.read('/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files/configurations.ini')
 setting = config['settings']
 
 KNOWN_FACES_DIR = setting['img_path']
-UNKNOWN_DIR = setting['temp_path']
+UNKNOWN_FACES_DIR = setting['temp_photo_path']
 KNOWN_AUDIO_DIR = setting['sound_path']
+UNKNOWN_AUDIO_DIR = setting['temp_sounds_path']
+MONGOIP = setting['mongo_con']
 TOLERANCE = 0.6
 FRAME_THICKNESS = 3
 FONT_THICKNESS = 2
@@ -28,7 +31,7 @@ MODEL = 'hog'  # default: 'hog', other one can be 'cnn' - CUDA accelerated (if a
 # Return ObjectId client or None
 # This function get the Unknown file on temp dir
 def identify_user(flag, db):
-    if os.listdir(UNKNOWN_DIR)[0] is None:
+    if not os.listdir(UNKNOWN_FACES_DIR) and not os.listdir(UNKNOWN_AUDIO_DIR)[0]:
         logging.error('No file')
         return None
 
@@ -39,25 +42,34 @@ def identify_user(flag, db):
         if read_all_audios(db) is False:
             logging.error('error to extract wav files')
             return
-
+        start_time = time.time()
         for filename in os.listdir(KNOWN_AUDIO_DIR):
-            res = match_audio(os.path.join(UNKNOWN_DIR, os.listdir(UNKNOWN_DIR)[0]),
+            res = match_audio(os.path.join(UNKNOWN_AUDIO_DIR, os.listdir(UNKNOWN_AUDIO_DIR)[0]),
                               os.path.join(KNOWN_AUDIO_DIR, filename))
             if res != 0:
                 temp_res.append({'song': filename, 'res': res})
 
-        if temp_res is not []:
-            best_res = get_best_result(temp_res)
-        else:
+        if not temp_res:
+            print('No results')
+            print("--- %s seconds ---" % (time.time() - start_time))
             return None
+        else:
+            best_res = get_best_result(temp_res)
+            print('best result is' + best_res)
+            print("--- %s seconds ---" % (time.time() - start_time))
 
     if flag == 0:
         if read_all_images(db) is False:
             logging.error('error to extract png files')
             return None
+        start_time = time.time()
         best_res = search_face()
+        print("--- %s seconds ---" % (time.time() - start_time))
+        if best_res is None:
+            return None
 
     return ObjectId(best_res.split('.')[0].split('_')[0])
+
 
 
 def get_best_result(results):
@@ -116,10 +128,10 @@ def search_face():
 
     print('Processing unknown faces...')
     # Now let's loop over a folder of faces we want to label
-    for filename in os.listdir(UNKNOWN_DIR):
+    for filename in os.listdir(UNKNOWN_FACES_DIR):
         # Load image
         print(f'Unknown Faces: Filename {filename}', end='')
-        image = face_recognition.load_image_file(f'{UNKNOWN_DIR}/{filename}')
+        image = face_recognition.load_image_file(f'{UNKNOWN_FACES_DIR}/{filename}')
 
         # This time we first grab face locations - we'll need them to draw boxes
         locations = face_recognition.face_locations(image, model=MODEL)
@@ -127,7 +139,7 @@ def search_face():
         # Now since we know loctions, we can pass them to face_encodings as second argument
         # Without that it will search for faces once again slowing down whole process
         encodings = face_recognition.face_encodings(image, locations)
-
+        match = None
         # But this time we assume that there might be more faces in an image - we can find faces of dirrerent people
         print(f', found {len(encodings)} face(s)')
         for face_encoding, face_location in zip(encodings, locations):
@@ -138,7 +150,6 @@ def search_face():
 
             # Since order is being preserved, we check if any face was found then grab index
             # then label (name) of first matching known face withing a tolerance
-            match = None
 
             print(results)
             if True in results:  # If at least one is true, get a name of first of found labels
