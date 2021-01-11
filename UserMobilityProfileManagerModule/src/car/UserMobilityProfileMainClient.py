@@ -22,7 +22,7 @@ from pymongo import MongoClient
 
 # prendere dati da config file
 config = configparser.ConfigParser()
-config.read(os.path.join('/home/pi/Desktop/project/Car controll', 'configurations.ini'))
+config.read(os.path.join('/home/pi/Desktop/project/Car_controll', 'configurations.ini'))
 setting = config['settings']
 
 app_gui = ''
@@ -36,11 +36,11 @@ TOLERANCE = 0.6
 FRAME_THICKNESS = 3
 FONT_THICKNESS = 2
 MODEL = 'hog'  # default: 'hog', other one can be 'cnn' - CUDA accelerated (if available) deep-learning pretrained model
-VEHICLE_IN_PORT = 65432
+VEHICLE_IN_PORT = 65430
 VEHICLE_URL = '192.168.1.211'
 
 CLOUD_IN_PORT = 55452
-CLOUD_URL = '192.168.1.211'
+CLOUD_URL = '192.168.3.72'
 
 
 def open_db():
@@ -68,6 +68,7 @@ def get_all_users():
 # Want ObjectId not the string of id
 def modify_fields_user(user_id, field, value):
     db = open_db()
+    print('try to modify:\nUser:' + str(user_id) + '\nField:' + field + '\nValue:' + value)
     result = modify_to_ump(user_id, db, field, value)
     if result.acknowledged is True:
         return modify_user_in_cloud(user_id, field, value)
@@ -80,9 +81,10 @@ def modify_fields_user(user_id, field, value):
 def get_image_by_id(user_id):
     db = open_db()
     user_photo = read_one_image_of_user(db, user_id)
-    output = open(os.path.join(KNOWN_FACES_DIR, str(user_id) + '.png'), 'wb')
-    output.write(user_photo)
-    output.close()
+    if user_photo is not None:
+        output = open(os.path.join(KNOWN_FACES_DIR, str(user_id) + '.png'), 'wb')
+        output.write(user_photo)
+        output.close()
 
     return True
 
@@ -121,32 +123,34 @@ def recognize_user(request_id, data_type, data):
     user_id = identify_user(flag, db)
     if user_id is None:
         logging.info('User is not identified on local')
-        user = request_user_cloud(request_id, data_type, data)
+        user = request_user_cloud(request_id, data_type, base64.encodebytes(data).decode('utf-8'))
         if user is None:
             logging.info('User is not identified on cloud, create temp user')
-            #user = create_temp_user()
         else:
-            create_user(db, user)
+            logging.info('User identify')
+            user_id = user['_id']
+            user['_id'] = ObjectId(user_id)
     else:
         user = get_user(user_id)
 
-    response = []
-    response.insert(request_id)
-    response.insert(user)
-
-    try:
-        app_gui.listbox_insert('Start insert user')
-        insert_user_in_gui(user)
-        app_gui.listbox_insert('Created client')
-    except:
-        app_gui.listbox_insert('Error to create client')
+    if user is not None:
+        try:
+            print(user)
+            app_gui.listbox_insert('Start insert user')
+            insert_user_in_gui(user)
+            app_gui.listbox_insert('Created client')
+        except:
+            app_gui.listbox_insert('Error to create client')
 
     os.remove(data_path)  # pulisce
-    return response
+    return user_id
 
 
 def insert_user_in_gui(client):
-    get_image_by_id(client['_id'])
+    try:
+        get_image_by_id(client['_id'])
+    except:
+        print('Error to get image of client')
     if not app_gui.add_user(client):
         return False
     app_gui.listbox_insert('Insert user in GUI')
@@ -154,11 +158,16 @@ def insert_user_in_gui(client):
 
 
 def modify_user_in_cloud(user_id, field, value):
-    return request_remote_ump(1, 'modify', {'_id': user_id, 'field': field, 'value': value})
+    if request_remote_ump(1, 'modify', {'_id': str(user_id), 'field': field, 'value': value}):
+        return True
+    return False
 
 
 def request_user_cloud(request_id, data_type, data):
-    return request_remote_ump(request_id, data_type, data)
+    res = request_remote_ump(request_id, data_type, data)
+    if not res:
+        return None
+    return res
 
 
 # +++++++++++++++++++++       logica di Identificazione +++++++++++++++++++++++++++++++++++++++++++
@@ -169,7 +178,7 @@ def request_user_cloud(request_id, data_type, data):
 # Return ObjectId client or None
 # This function get the Unknown file on temp dir
 def identify_user(flag, db):
-    if os.listdir(UNKNOWN_FACES_DIR)[0] is None and os.listdir(UNKNOWN_AUDIO_DIR)[0] is None:
+    if not os.listdir(UNKNOWN_FACES_DIR) and not os.listdir(UNKNOWN_AUDIO_DIR)[0]:
         logging.error('No file')
         return None
 
@@ -188,11 +197,14 @@ def identify_user(flag, db):
             if res != 0:
                 temp_res.append({'song': filename, 'res': res})
 
-        if temp_res is not []:
-            best_res = get_best_result(temp_res)
+        if not temp_res:
+            print('No results')
             print("--- %s seconds ---" % (time.time() - start_time))
-        else:
             return None
+        else:
+            best_res = get_best_result(temp_res)
+            print('best result is' + best_res)
+            print("--- %s seconds ---" % (time.time() - start_time))
 
     if flag == 0:
         app_gui.listbox_insert('Start to elaborate photo')
@@ -202,6 +214,8 @@ def identify_user(flag, db):
         start_time = time.time()
         best_res = search_face()
         print("--- %s seconds ---" % (time.time() - start_time))
+        if best_res is None:
+            return None
 
     return ObjectId(best_res.split('.')[0].split('_')[0])
 
@@ -226,7 +240,7 @@ def match_audio(song1, song2):
     similarity = fuzz.ratio(fingerprint1, fingerprint2)
     print(similarity)
 
-    if similarity >= 50:
+    if similarity >= 80:
         return similarity
 
     return 0
@@ -276,6 +290,7 @@ def search_face():
 
         # But this time we assume that there might be more faces in an image - we can find faces of dirrerent people
         print(f', found {len(encodings)} face(s)')
+        match = None
         for face_encoding, face_location in zip(encodings, locations):
 
             # We use compare_faces (but might use face_distance as well)
@@ -284,7 +299,6 @@ def search_face():
 
             # Since order is being preserved, we check if any face was found then grab index
             # then label (name) of first matching known face withing a tolerance
-            match = None
 
             print(results)
             if True in results:  # If at least one is true, get a name of first of found labels
@@ -521,7 +535,7 @@ def server_vehicle_recv(sensor_socket):
 
     user_id = recognize_user(request_id, data_type, base64.decodebytes(data.encode()))
 
-    return_user_identifier(request_id, user_id, sensor_socket)
+    return_user_identifier(request_id, str(user_id), sensor_socket)
 
     sensor_socket.close()
     logging.info("Vehicle - T_recv : chiusura socket di comunicazione con il sensore " + str(sensor_socket))
@@ -551,8 +565,11 @@ vehicle_server = Server(VEHICLE_IN_PORT, "Vehicle - Main", server_vehicle_accept
 
 def request_remote_ump(inquiry_id, data_type, data):
     s = socket.socket()
-    s.connect((CLOUD_URL, CLOUD_IN_PORT))
-
+    try:
+        s.connect((CLOUD_URL, CLOUD_IN_PORT))
+    except:
+        print('Error to connect cloud')
+        return False
     logging.info("Vehicle : socket to the cloud successfully created")
     payload = {'inquiryID': inquiry_id, 'dataType': data_type, 'data': data}
 
@@ -564,10 +581,17 @@ def request_remote_ump(inquiry_id, data_type, data):
     buffer = recv(s)
     s.close()
     logging.info("Cloud : Response received, socket closed")
-
     try:
         inquiry_id = buffer["inquiryID"]
         ump = buffer["UMP"]
+
+        if ump is not None:
+            data = base64.decodebytes(buffer['image'].encode())
+            data_path = os.path.join(KNOWN_FACES_DIR, ump['_id'] + '_0.png')
+            output = open(data_path, 'wb')
+            output.write(data)
+            output.close()
+
     except(Exception):
         logging.info("Cloud  : failed in parsing the data")
         return False
@@ -575,7 +599,6 @@ def request_remote_ump(inquiry_id, data_type, data):
     if inquiry_id != inquiry_id:
         logging.info("Cloud  : The request identificator doesn't correspond")
         return None
-
     return ump
 
 
@@ -602,63 +625,83 @@ class UserProfile(Frame):
         init_ui(value)
 
 
+def combine_funcs(*funcs):
+    def combined_func(*args, **kwargs):
+        for f in funcs:
+            f(*args, **kwargs)
+
+    return combined_func
+
+
 def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age, arg3, gender, arg4, country, arg5,
          home_loc, arg6, job_loc, arg7):
     time = datetime.datetime.now()
-    if len(arg1.get()) != 0:
-        result = modify_fields_user(id, "name", arg1.get())
-        if result:
-            name.configure(text="Name: " + arg1.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
-
-    if len(arg2.get()) != 0:
-        result = modify_fields_user(id, "surname", arg2.get())
-        if result:
-            surname.configure(text="Surname: " + arg2.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field surname: " + arg2.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field surname: " + arg2.get())
-
-    if len(arg3.get()) != 0:
-        try:
-            int(str(arg3.get()))  # check if a number was actually entered
-            result = modify_fields_user(id, "age", arg3.get())
+    try:
+        if len(arg1.get()) != 0:
+            result = modify_fields_user(user_id, "Name", arg1.get())
             if result:
-                age.configure(text="Age: " + arg3.get())
-                listbox.insert(END, str(time) + ": updated profile " + user_id + " field age: " + arg3.get())
-                main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field age: " + arg3.get())
-        except ValueError:
-            messagebox.showwarning(title=None, message="Age entered is not numeric.")
+                name.configure(text="Name: " + arg1.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field name: " + arg1.get())
+                main_listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field name: " + arg1.get())
 
-    if arg4.get() != "-":
-        result = modify_fields_user(id, "gender", arg4.get())
-        if result:
-            gender.configure(text="Gender: " + arg4.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
+        if len(arg2.get()) != 0:
+            result = modify_fields_user(user_id, "surname", arg2.get())
+            if result:
+                surname.configure(text="Surname: " + arg2.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field surname: " + arg2.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(user_id) + " field surname: " + arg2.get())
 
-    if arg5.get() != "-":  # Country
-        result = modify_fields_user(id, "country", arg5.get())
-        if result:
-            country.configure(text="Country: " + arg5.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
+        if len(arg3.get()) != 0:
+            try:
+                int(str(arg3.get()))  # check if a number was actually entered
+                result = modify_fields_user(user_id, "age", arg3.get())
+                if result:
+                    age.configure(text="Age: " + arg3.get())
+                    listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field age: " + arg3.get())
+                    main_listbox.insert(END,
+                                        str(time) + ": updated profile " + str(user_id) + " field age: " + arg3.get())
+            except ValueError:
+                messagebox.showwarning(title=None, message="Age entered is not numeric.")
 
-    if len(arg6.get()) != 0:  # home location
-        result = modify_fields_user(id, "home_location", arg6.get())
-        if result:
-            home_loc.configure(text="Home Location: " + arg6.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
+        if arg4.get() != "-":
+            result = modify_fields_user(user_id, "gender", arg4.get())
+            if result:
+                gender.configure(text="Gender: " + arg4.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field gender: " + arg4.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(user_id) + " field gender: " + arg4.get())
 
-    if len(arg7.get()) != 0:  # job location
-        result = modify_fields_user(id, "job location", arg7.get())
-        if result:
-            job_loc.configure(text="Home Location: " + arg7.get())
+        if arg5.get() != "-":  # Country
+            result = modify_fields_user(user_id, "country", arg5.get())
+            if result:
+                country.configure(text="Country: " + arg5.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field country: " + arg5.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(user_id) + " field country: " + arg5.get())
 
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field job location: " + arg7.get())
-            main_listbox.insert(END,
-                                str(time) + ": updated profile " + user_id + " field job location: " + arg7.get())
+        if len(arg6.get()) != 0:  # home location
+            result = modify_fields_user(user_id, "home_location", arg6.get())
+            if result:
+                home_loc.configure(text="Home Location: " + arg6.get())
+                listbox.insert(END,
+                               str(time) + ": updated profile " + str(user_id) + " field home location: " + arg6.get())
+                main_listbox.insert(END, str(time) + ": updated profile " + str(
+                    user_id) + " field home location: " + arg6.get())
+
+        if len(arg7.get()) != 0:  # job location
+            result = modify_fields_user(user_id, "job location", arg7.get())
+            if result:
+                job_loc.configure(text="Home Location: " + arg7.get())
+
+                listbox.insert(END,
+                               str(time) + ": updated profile " + str(user_id) + " field job location: " + arg7.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(
+                                        user_id) + " field job location: " + arg7.get())
+    except Exception:
+        logging.info('Error to update user')
+        main_listbox.insert(END, 'Error to update user')
 
 
 def get_field(client, field):
@@ -680,14 +723,12 @@ class MainWindow(Frame):
         self.i = 0
         self.images = []
 
-    def populate_method(self, method):
-        self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
-        client = ""
-        for item in self.users:
-            if item["_id"] == method:
-                client = item
-                break
-        self.open_profile(client)
+    def populate_method(self, user_id):
+        self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + user_id)
+        for user in self.users:
+            if user["_id"] == ObjectId(user_id):
+                self.open_profile(user)
+        return
 
     def set_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
@@ -735,7 +776,7 @@ class MainWindow(Frame):
     def open_edit(self, value, listbox, name, surname, age, gender, country, home_loc, job_loc):
         t = Toplevel(self)
         t.wm_title("Edit Profile")
-        t.geometry("600x700++300+300")
+        t.geometry("600x700+300+300")
         Label(t, font=('lato', 20), text="Edit profile", bd=18, justify="left").pack()
 
         u_frame = Frame(t)
@@ -795,24 +836,26 @@ class MainWindow(Frame):
         row += 1
 
         Button(u_frame, text="Submit", font=('lato', 18), bd=18,
-               command=lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
-                              srnme=surname,
-                              arg2=surname_var, age=age,
-                              arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
-                              home_loc=home_loc, arg6=home_loc_var,
-                              job_loc=job_loc, arg7=job_loc_var
-               : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
-                      arg2, age, arg3, gender, arg4, country, arg5,
-                      home_loc, arg6, job_loc, arg7)).grid(row=row,
-                                                           column=1)
+               command=combine_funcs(
+                   (lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
+                           srnme=surname,
+                           arg2=surname_var, age=age,
+                           arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
+                           home_loc=home_loc, arg6=home_loc_var,
+                           job_loc=job_loc, arg7=job_loc_var
+                    : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
+                           arg2, age, arg3, gender, arg4, country, arg5,
+                           home_loc, arg6, job_loc, arg7)), t.destroy)).grid(row=row,
+                                                                             column=1)
 
         Button(u_frame, text="Close", font=('lato', 18), bd=18, command=t.destroy).grid(row=row,
                                                                                         column=2)
 
     def open_profile(self, client):
         t = Toplevel(self)
+        print(client)
         t.wm_title("User Mobility Profile - " + client["Name"] + " " + client["surname"])
-        t.geometry("760x960+150+300")
+        t.geometry("1200x800+150+300")
 
         u_frame = LabelFrame(t)
 
@@ -944,18 +987,20 @@ class MainWindow(Frame):
         im = Image.open(os.path.join(KNOWN_FACES_DIR, str(client['_id']) + '_0.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        print("charging " + client['_id'])
-        Button(self.canvas, text=client["Name"] + " " + client[
-            "surname"], image=photo, command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18),
+        print("charging " + str(client['_id']))
+        Button(self.canvas, text=str(client["Name"]) + " " + client[
+            "surname"], image=photo, command=lambda m=str(client["_id"]): self.populate_method(m), font=('lato', 18),
                bd=18).grid(row=1, column=self.i)
         self.i += 1
         self.images.append(photo)
 
     def add_user(self, user):
         for item in self.users:
-            if user["_id"] is item["_id"]:
+            if user["_id"] == item["_id"]:
                 return False
+
         self.users.append(user)
+        print(user)
         self.update_frame(user)
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + user["Name"] + " " + user[
             "surname"])
@@ -965,8 +1010,27 @@ class MainWindow(Frame):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ":" + value)
 
 
+def clean_folder():
+    for f in os.listdir(KNOWN_FACES_DIR):
+        os.remove(os.path.join(KNOWN_FACES_DIR, f))
+
+    for f in os.listdir(UNKNOWN_FACES_DIR):
+        os.remove(os.path.join(UNKNOWN_FACES_DIR, f))
+
+    for f in os.listdir(KNOWN_AUDIO_DIR):
+        os.remove(os.path.join(KNOWN_AUDIO_DIR, f))
+
+    for f in os.listdir(UNKNOWN_AUDIO_DIR):
+        os.remove(os.path.join(UNKNOWN_AUDIO_DIR, f))
+
+    print('Clean all folder')
+
+
 def main():
     global app_gui
+
+    clean_folder()
+
     root = Tk()
     root.geometry("560x560+300+300")
     app_gui = MainWindow()

@@ -19,7 +19,7 @@ from common.DatabaseConnector import *
 
 MTU = 1024
 CLOUD_IN_PORT = 55452
-CLOUD_URL = '192.168.1.211'
+CLOUD_URL = '192.168.3.72'
 
 # prendere dati da config file
 config = configparser.ConfigParser()
@@ -38,15 +38,10 @@ TOLERANCE = 0.6
 FRAME_THICKNESS = 3
 FONT_THICKNESS = 2
 MODEL = 'hog'  # default: 'hog', other one can be 'cnn' - CUDA accelerated (if available) deep-learning pretrained model
-VEHICLE_IN_PORT = 65432
-VEHICLE_URL = '192.168.1.211'
-
-CLOUD_IN_PORT = 55452
-CLOUD_URL = '192.168.1.211'
 
 
 def open_db():
-    client = MongoClient(setting['mongo_con'])
+    client = MongoClient('mongodb://localhost:27017/')
     return client.UserProfileManagerDB
 
 
@@ -54,6 +49,7 @@ def open_db():
 def get_user(user_id):
     db = open_db()
     return read_all_from_ump(ObjectId(user_id), db)
+
 
 def get_all_users():
     db = open_db()
@@ -90,10 +86,10 @@ def recognize_user(request_id, data_type, data):
         return None
 
     if data_type == 'song':
-        data_path = os.path.join(setting['temp_path'], 'temp' + '.wav')
+        data_path = os.path.join(UNKNOWN_AUDIO_DIR, 'temp' + '.wav')
         flag = 1
     elif data_type == 'photo':
-        data_path = os.path.join(setting['temp_path'], 'temp' + '.png')
+        data_path = os.path.join(UNKNOWN_FACES_DIR, 'temp' + '.png')
         flag = 0
     else:
         return False
@@ -103,17 +99,13 @@ def recognize_user(request_id, data_type, data):
 
     user_id = identify_user(flag, db)
     if user_id is None:
-        logging.info('User is not identified on local')
-        # user = create_temp_user()
+        logging.info('User is not identified on Cloud')
+        user = None
     else:
         user = get_user(user_id)
 
-    response = []
-    response.insert(request_id)
-    response.insert(user)
-
     os.remove(data_path)  # pulisce
-    return response
+    return user
 
 
 class Server:
@@ -125,7 +117,7 @@ class Server:
 
     def setup(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((socket.gethostname(), self.port))
+        self.socket.bind((CLOUD_URL, self.port))
         self.socket.listen(5)
 
         logging.info(str(self.type) + "  : server socket created")
@@ -194,12 +186,29 @@ def server_cloud_recv(vehicle_socket):
 cloud_server = Server(CLOUD_IN_PORT, "Cloud - Main", server_cloud_accept)
 
 
-def return_remote_ump(inquiry_id, ump, vehicle_socket):
-    payload = {'inquiryID': inquiry_id, 'UMP': ump}
-
+def return_remote_ump(inquiry_id, user, vehicle_socket):
+    if user is not None:
+        image = prepare_image(user['_id'])
+        payload = {'inquiryID': inquiry_id, 'UMP': clean_dictionary(user), 'image': image}
+    else:
+        payload = {'inquiryID': inquiry_id, 'UMP': user}
     vehicle_socket.sendall(json.dumps(payload).encode('utf-8'))
     logging.info("Vehicle - T_recv : UMP successfully sended")
     return True
+
+def prepare_image(user_id):
+    print(str(user_id))
+    file = open(os.path.join(KNOWN_FACES_DIR, str(user_id) + '_0.png'),'rb')
+    data_byte = file.read()
+    return base64.encodebytes(data_byte).decode('utf-8')
+
+
+def clean_dictionary(user):
+    del user['image']
+    del user['audio']
+    user_id = user['_id']
+    user['_id'] = str(user_id)
+    return user
 
 
 def request_remote_ump(inquiry_id, data_type, data):
@@ -238,28 +247,32 @@ def request_handler(buffer, vehicle_socket):
         data_type = buffer["dataType"]
         data = buffer["data"]
     except Exception:
-        logging.info("Cloud - T_recv  : fail in parsing the data")
+        logging.info("Cloud - T_recv  1: fail in parsing the data")
         return False
 
     logging.info("Cloud - T_recv : data successfully parsed")
+    if data_type == 'modify':
+        return False
 
-    user_id = recognize_user(inquiry_id, data_type, base64.decodebytes(data.encode()))
+    user = recognize_user(inquiry_id, data_type, base64.decodebytes(data.encode()))
 
-    return return_remote_ump(inquiry_id, user_id, vehicle_socket)
+    return return_remote_ump(inquiry_id, user, vehicle_socket)
 
 
 def update_handler(buffer, vehicle_socket):
     try:
+        print(buffer)
         inquiry_id = buffer["inquiryID"]
-        ump = buffer["UMP"]
+        datatype = buffer['dataType']
+        ump = buffer['data']
     except Exception:
-        logging.info("Cloud - T_recv  : fail in parsing the data")
+        logging.info("Cloud - T_recv  2: fail in parsing the data")
         return False
 
     logging.info("Cloud - T_recv : data successfully parsed")
 
     # bind con la parte di federico
-    response = modify_fields_user(ump['_id'], ump['field'], ump['value'])
+    response = modify_fields_user(ObjectId(ump['_id']), ump['field'], ump['value'])
     if response.acknowledged is True:
         res = '1'
     else:
@@ -294,63 +307,83 @@ class UserProfile(Frame):
         init_ui(value)
 
 
+def combine_funcs(*funcs):
+    def combined_func(*args, **kwargs):
+        for f in funcs:
+            f(*args, **kwargs)
+
+    return combined_func
+
+
 def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age, arg3, gender, arg4, country, arg5,
          home_loc, arg6, job_loc, arg7):
     time = datetime.datetime.now()
-    if len(arg1.get()) != 0:
-        result = modify_fields_user(id, "name", arg1.get())
-        if result:
-            name.configure(text="Name: " + arg1.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field name: " + arg1.get())
-
-    if len(arg2.get()) != 0:
-        result = modify_fields_user(id, "surname", arg2.get())
-        if result:
-            surname.configure(text="Surname: " + arg2.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field surname: " + arg2.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field surname: " + arg2.get())
-
-    if len(arg3.get()) != 0:
-        try:
-            int(str(arg3.get()))  # check if a number was actually entered
-            result = modify_fields_user(id, "age", arg3.get())
+    try:
+        if len(arg1.get()) != 0:
+            result = modify_fields_user(user_id, "Name", arg1.get())
             if result:
-                age.configure(text="Age: " + arg3.get())
-                listbox.insert(END, str(time) + ": updated profile " + user_id + " field age: " + arg3.get())
-                main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field age: " + arg3.get())
-        except ValueError:
-            messagebox.showwarning(title=None, message="Age entered is not numeric.")
+                name.configure(text="Name: " + arg1.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field name: " + arg1.get())
+                main_listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field name: " + arg1.get())
 
-    if arg4.get() != "-":
-        result = modify_fields_user(id, "gender", arg4.get())
-        if result:
-            gender.configure(text="Gender: " + arg4.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field gender: " + arg4.get())
+        if len(arg2.get()) != 0:
+            result = modify_fields_user(user_id, "surname", arg2.get())
+            if result:
+                surname.configure(text="Surname: " + arg2.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field surname: " + arg2.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(user_id) + " field surname: " + arg2.get())
 
-    if arg5.get() != "-":  # Country
-        result = modify_fields_user(id, "country", arg5.get())
-        if result:
-            country.configure(text="Country: " + arg5.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field country: " + arg5.get())
+        if len(arg3.get()) != 0:
+            try:
+                int(str(arg3.get()))  # check if a number was actually entered
+                result = modify_fields_user(user_id, "age", arg3.get())
+                if result:
+                    age.configure(text="Age: " + arg3.get())
+                    listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field age: " + arg3.get())
+                    main_listbox.insert(END,
+                                        str(time) + ": updated profile " + str(user_id) + " field age: " + arg3.get())
+            except ValueError:
+                messagebox.showwarning(title=None, message="Age entered is not numeric.")
 
-    if len(arg6.get()) != 0:  # home location
-        result = modify_fields_user(id, "home_location", arg6.get())
-        if result:
-            home_loc.configure(text="Home Location: " + arg6.get())
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
-            main_listbox.insert(END, str(time) + ": updated profile " + user_id + " field home location: " + arg6.get())
+        if arg4.get() != "-":
+            result = modify_fields_user(user_id, "gender", arg4.get())
+            if result:
+                gender.configure(text="Gender: " + arg4.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field gender: " + arg4.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(user_id) + " field gender: " + arg4.get())
 
-    if len(arg7.get()) != 0:  # job location
-        result = modify_fields_user(id, "job location", arg7.get())
-        if result:
-            job_loc.configure(text="Home Location: " + arg7.get())
+        if arg5.get() != "-":  # Country
+            result = modify_fields_user(user_id, "country", arg5.get())
+            if result:
+                country.configure(text="Country: " + arg5.get())
+                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field country: " + arg5.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(user_id) + " field country: " + arg5.get())
 
-            listbox.insert(END, str(time) + ": updated profile " + user_id + " field job location: " + arg7.get())
-            main_listbox.insert(END,
-                                str(time) + ": updated profile " + user_id + " field job location: " + arg7.get())
+        if len(arg6.get()) != 0:  # home location
+            result = modify_fields_user(user_id, "home_location", arg6.get())
+            if result:
+                home_loc.configure(text="Home Location: " + arg6.get())
+                listbox.insert(END,
+                               str(time) + ": updated profile " + str(user_id) + " field home location: " + arg6.get())
+                main_listbox.insert(END, str(time) + ": updated profile " + str(
+                    user_id) + " field home location: " + arg6.get())
+
+        if len(arg7.get()) != 0:  # job location
+            result = modify_fields_user(user_id, "job location", arg7.get())
+            if result:
+                job_loc.configure(text="Home Location: " + arg7.get())
+
+                listbox.insert(END,
+                               str(time) + ": updated profile " + str(user_id) + " field job location: " + arg7.get())
+                main_listbox.insert(END,
+                                    str(time) + ": updated profile " + str(
+                                        user_id) + " field job location: " + arg7.get())
+    except Exception:
+        logging.info('Error to update user')
+        main_listbox.insert(END, 'Error to update user')
 
 
 def get_field(client, field):
@@ -376,7 +409,7 @@ class MainWindow(Frame):
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
         client = ""
         for item in self.users:
-            if item["_id"] == method:
+            if item["_id"] == ObjectId(method):
                 client = item
                 break
         self.open_profile(client)
@@ -427,7 +460,7 @@ class MainWindow(Frame):
     def open_edit(self, value, listbox, name, surname, age, gender, country, home_loc, job_loc):
         t = Toplevel(self)
         t.wm_title("Edit Profile")
-        t.geometry("600x700++300+300")
+        t.geometry("600x700+300+300")
         Label(t, font=('lato', 20), text="Edit profile", bd=18, justify="left").pack()
 
         u_frame = Frame(t)
@@ -487,16 +520,17 @@ class MainWindow(Frame):
         row += 1
 
         Button(u_frame, text="Submit", font=('lato', 18), bd=18,
-               command=lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
-                              srnme=surname,
-                              arg2=surname_var, age=age,
-                              arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
-                              home_loc=home_loc, arg6=home_loc_var,
-                              job_loc=job_loc, arg7=job_loc_var
-               : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
-                      arg2, age, arg3, gender, arg4, country, arg5,
-                      home_loc, arg6, job_loc, arg7)).grid(row=row,
-                                                           column=1)
+               command=combine_funcs(
+                   (lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
+                           srnme=surname,
+                           arg2=surname_var, age=age,
+                           arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
+                           home_loc=home_loc, arg6=home_loc_var,
+                           job_loc=job_loc, arg7=job_loc_var
+                    : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
+                           arg2, age, arg3, gender, arg4, country, arg5,
+                           home_loc, arg6, job_loc, arg7)), t.destroy)).grid(row=row,
+                                                                             column=1)
 
         Button(u_frame, text="Close", font=('lato', 18), bd=18, command=t.destroy).grid(row=row,
                                                                                         column=2)
@@ -504,7 +538,7 @@ class MainWindow(Frame):
     def open_profile(self, client):
         t = Toplevel(self)
         t.wm_title("User Mobility Profile - " + client["Name"] + " " + client["surname"])
-        t.geometry("760x960+150+300")
+        t.geometry("760x1200+150+300")
 
         u_frame = LabelFrame(t)
 
@@ -636,9 +670,9 @@ class MainWindow(Frame):
         im = Image.open(os.path.join(KNOWN_FACES_DIR, str(client['_id']) + '_0.png'))
         im = im.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(im)
-        print("charging " + client['_id'])
-        Button(self.canvas, text=client["Name"] + " " + client[
-            "surname"], image=photo, command=lambda m=client["_id"]: self.populate_method(m), font=('lato', 18),
+        print("charging " + str(client['_id']))
+        Button(self.canvas, text=str(client["Name"]) + " " + client[
+            "surname"], image=photo, command=lambda m=str(client["_id"]): self.populate_method(m), font=('lato', 18),
                bd=18).grid(row=1, column=self.i)
         self.i += 1
         self.images.append(photo)
@@ -648,6 +682,7 @@ class MainWindow(Frame):
             if user["_id"] is item["_id"]:
                 return False
         self.users.append(user)
+        print(user)
         self.update_frame(user)
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + user["Name"] + " " + user[
             "surname"])
@@ -664,6 +699,7 @@ def insert_all_users():
     for user in users:
         if app_gui.add_user(user) is False:
             print("Error")
+
 
 def main():
     global app_gui
