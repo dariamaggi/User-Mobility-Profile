@@ -1,3 +1,5 @@
+import shlex
+import subprocess
 import time
 from bson import ObjectId
 from common.DatabaseConnector import *
@@ -12,7 +14,8 @@ from fuzzywuzzy import fuzz
 
 config = configparser.ConfigParser()
 path = Path(__file__).parent.parent.parent
-config.read('/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files/configurations.ini')
+config.read(
+    '/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files/configurations.ini')
 setting = config['settings']
 
 KNOWN_FACES_DIR = setting['img_path']
@@ -69,7 +72,6 @@ def identify_user(flag, db):
             return None
 
     return ObjectId(best_res.split('.')[0].split('_')[0])
-
 
 
 def get_best_result(results):

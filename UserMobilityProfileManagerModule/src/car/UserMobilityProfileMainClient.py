@@ -22,7 +22,9 @@ from pymongo import MongoClient
 
 # prendere dati da config file
 config = configparser.ConfigParser()
-config.read(os.path.join('/home/pi/Desktop/project/Car_controll', 'configurations.ini'))
+config.read(
+    os.path.join('/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files',
+                 'configurations.ini'))
 setting = config['settings']
 
 app_gui = ''
@@ -38,6 +40,9 @@ FONT_THICKNESS = 2
 MODEL = 'hog'  # default: 'hog', other one can be 'cnn' - CUDA accelerated (if available) deep-learning pretrained model
 VEHICLE_IN_PORT = 65430
 VEHICLE_URL = '192.168.1.211'
+
+KNOWN_FACES = []
+KNOWN_NAMES = []
 
 CLOUD_IN_PORT = 55452
 CLOUD_URL = '192.168.3.72'
@@ -208,9 +213,6 @@ def identify_user(flag, db):
 
     if flag == 0:
         app_gui.listbox_insert('Start to elaborate photo')
-        if read_all_images(db) is False:
-            logging.error('error to extract png files')
-            return None
         start_time = time.time()
         best_res = search_face()
         print("--- %s seconds ---" % (time.time() - start_time))
@@ -248,34 +250,13 @@ def match_audio(song1, song2):
 
 def search_face():
     print('Loading known faces...')
-    known_faces = []
-    known_names = []
 
     # We oranize known faces as subfolders of KNOWN_FACES_DIR
     # Each subfolder's name becomes our label (name)
-    for name in os.listdir(KNOWN_FACES_DIR):
-
-        # Next we load every file of faces of known person
-        # for filename in os.listdir(f'{KNOWN_FACES_DIR}/{name}'):
-
-        # Load an image
-        image = face_recognition.load_image_file(f'{KNOWN_FACES_DIR}/{name}')
-
-        # Get 128-dimension face encoding Always returns a list of found faces, for this purpose we take first face
-        # only (assuming one face per image as you can't be twice on one image)
-        try:
-            encoding = face_recognition.face_encodings(image)[0]
-            # Append encodings and name
-            known_faces.append(encoding)
-            known_names.append(name)
-            print(f'Known Faces: Filename {name} \n', end='')
-
-        except Exception as e:
-            print(f"Error to encode image: {KNOWN_FACES_DIR}/{name} \n {e}")
-            pass
 
     print('Processing unknown faces...')
     # Now let's loop over a folder of faces we want to label
+
     for filename in os.listdir(UNKNOWN_FACES_DIR):
         # Load image
         print(f'Unknown Faces: Filename {filename}', end='')
@@ -295,15 +276,19 @@ def search_face():
 
             # We use compare_faces (but might use face_distance as well)
             # Returns array of True/False values in order of passed known_faces
-            results = face_recognition.compare_faces(known_faces, face_encoding, TOLERANCE)
-
+            face_index = 0
+            for know_face in KNOWN_FACES:
+                # list.append(know_face)
+                results = face_recognition.compare_faces([know_face], face_encoding, TOLERANCE)
+                print(results)
+                if True in results:  # If at least one is true, get a name of first of found labels
+                    match = KNOWN_NAMES[face_index]
+                    return match
+                face_index += 1
+                # else:
+                #     list.remove(know_face)
             # Since order is being preserved, we check if any face was found then grab index
             # then label (name) of first matching known face withing a tolerance
-
-            print(results)
-            if True in results:  # If at least one is true, get a name of first of found labels
-                match = known_names[results.index(True)]
-                return match
 
         return match
 
@@ -1026,6 +1011,36 @@ def clean_folder():
     print('Clean all folder')
 
 
+def init_images():
+    global KNOWN_FACES
+    db = open_db()
+
+    if read_all_images(db) is False:
+        logging.error('error to extract png files')
+        return None
+
+    for name in os.listdir(KNOWN_FACES_DIR):
+
+        # Next we load every file of faces of known person
+        # for filename in os.listdir(f'{KNOWN_FACES_DIR}/{name}'):
+
+        # Load an image
+        image = face_recognition.load_image_file(f'{KNOWN_FACES_DIR}/{name}')
+
+        # Get 128-dimension face encoding Always returns a list of found faces, for this purpose we take first face
+        # only (assuming one face per image as you can't be twice on one image)
+        try:
+            encoding = face_recognition.face_encodings(image)[0]
+            # Append encodings and name
+            KNOWN_FACES.append(encoding)
+            KNOWN_NAMES.append(name)
+            print(f'Known Faces: Filename {name} \n', end='')
+
+        except Exception as e:
+            print(f"Error to encode image: {KNOWN_FACES_DIR}/{name} \n {e}")
+            pass
+
+
 def main():
     global app_gui
 
@@ -1034,6 +1049,8 @@ def main():
     root = Tk()
     root.geometry("560x560+300+300")
     app_gui = MainWindow()
+
+    init_images()
 
     vehicle_server.setup()
 
