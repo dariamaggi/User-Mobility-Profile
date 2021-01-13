@@ -2,17 +2,15 @@
 
 Progetto finale per il corso di Industrial Applications, Università di Pisa, a.a. 2020/2021.
 
-![general_scheme](https://github.com/dariamaggi/AutomativeSystem/blob/main/general%20scheme.jpg)
+![general_scheme](/general%20scheme.jpg)
 
-## Credits
+## Specifications
+For see more details, read also [Specifications File](The%20User%20Mobility%20Profile%20Project%20Specification.pdf)
 
-* [R. Bertini](https://github.com/RickyDenton)
-* [A. Chianese](https://github.com/Spearton)
-* [G. Gagliardi](https://github.com/guidogagl)
-* [M. Gómez](https://github.com/MarshaGomez)
-* [F. Lapenna](https://github.com/FedericoLapenna)
-* [D. Maggi](https://github.com/dariamaggi)
+## Prototype Report 
+For see more details, read also [Prototype Report](The%20User%20Mobility%20Profile%20Prototype%20Report.pdf)
 
+https://www.raspberrypi.org/software/
 ############################################################
 Image Ubuntu MATE 18.04 LTS Bionic for Raspberry pi 3
 ############################################################
@@ -128,6 +126,20 @@ sudo apt-get remove --auto-remove python3.6
 sudo apt-get purge python3.6
 sudo apt-get purge --auto-remove python3.6
 
+sudo apt-get update
+sudo apt install software-properties-common
+
+
+sudo apt-get install python3.7
 
 
 
+
+## Credits
+
+* [R. Bertini](https://github.com/RickyDenton)
+* [A. Chianese](https://github.com/Spearton)
+* [G. Gagliardi](https://github.com/guidogagl)
+* [M. Gómez](https://github.com/MarshaGomez)
+* [F. Lapenna](https://github.com/FedericoLapenna)
+* [D. Maggi](https://github.com/dariamaggi)
