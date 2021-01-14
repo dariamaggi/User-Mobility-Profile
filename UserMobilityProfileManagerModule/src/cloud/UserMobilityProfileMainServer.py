@@ -196,9 +196,10 @@ def return_remote_ump(inquiry_id, user, vehicle_socket):
     logging.info("Vehicle - T_recv : UMP successfully sended")
     return True
 
+
 def prepare_image(user_id):
     print(str(user_id))
-    file = open(os.path.join(KNOWN_FACES_DIR, str(user_id) + '_0.png'),'rb')
+    file = open(os.path.join(KNOWN_FACES_DIR, str(user_id) + '_0.png'), 'rb')
     data_byte = file.read()
     return base64.encodebytes(data_byte).decode('utf-8')
 
@@ -315,77 +316,6 @@ def combine_funcs(*funcs):
     return combined_func
 
 
-def edit(main_listbox, user_id, client, listbox, name, arg1, surname, arg2, age, arg3, gender, arg4, country, arg5,
-         home_loc, arg6, job_loc, arg7):
-    time = datetime.datetime.now()
-    try:
-        if len(arg1.get()) != 0:
-            result = modify_fields_user(user_id, "Name", arg1.get())
-            if result:
-                name.configure(text="Name: " + arg1.get())
-                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field name: " + arg1.get())
-                main_listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field name: " + arg1.get())
-
-        if len(arg2.get()) != 0:
-            result = modify_fields_user(user_id, "surname", arg2.get())
-            if result:
-                surname.configure(text="Surname: " + arg2.get())
-                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field surname: " + arg2.get())
-                main_listbox.insert(END,
-                                    str(time) + ": updated profile " + str(user_id) + " field surname: " + arg2.get())
-
-        if len(arg3.get()) != 0:
-            try:
-                int(str(arg3.get()))  # check if a number was actually entered
-                result = modify_fields_user(user_id, "age", arg3.get())
-                if result:
-                    age.configure(text="Age: " + arg3.get())
-                    listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field age: " + arg3.get())
-                    main_listbox.insert(END,
-                                        str(time) + ": updated profile " + str(user_id) + " field age: " + arg3.get())
-            except ValueError:
-                messagebox.showwarning(title=None, message="Age entered is not numeric.")
-
-        if arg4.get() != "-":
-            result = modify_fields_user(user_id, "gender", arg4.get())
-            if result:
-                gender.configure(text="Gender: " + arg4.get())
-                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field gender: " + arg4.get())
-                main_listbox.insert(END,
-                                    str(time) + ": updated profile " + str(user_id) + " field gender: " + arg4.get())
-
-        if arg5.get() != "-":  # Country
-            result = modify_fields_user(user_id, "country", arg5.get())
-            if result:
-                country.configure(text="Country: " + arg5.get())
-                listbox.insert(END, str(time) + ": updated profile " + str(user_id) + " field country: " + arg5.get())
-                main_listbox.insert(END,
-                                    str(time) + ": updated profile " + str(user_id) + " field country: " + arg5.get())
-
-        if len(arg6.get()) != 0:  # home location
-            result = modify_fields_user(user_id, "home_location", arg6.get())
-            if result:
-                home_loc.configure(text="Home Location: " + arg6.get())
-                listbox.insert(END,
-                               str(time) + ": updated profile " + str(user_id) + " field home location: " + arg6.get())
-                main_listbox.insert(END, str(time) + ": updated profile " + str(
-                    user_id) + " field home location: " + arg6.get())
-
-        if len(arg7.get()) != 0:  # job location
-            result = modify_fields_user(user_id, "job location", arg7.get())
-            if result:
-                job_loc.configure(text="Home Location: " + arg7.get())
-
-                listbox.insert(END,
-                               str(time) + ": updated profile " + str(user_id) + " field job location: " + arg7.get())
-                main_listbox.insert(END,
-                                    str(time) + ": updated profile " + str(
-                                        user_id) + " field job location: " + arg7.get())
-    except Exception:
-        logging.info('Error to update user')
-        main_listbox.insert(END, 'Error to update user')
-
-
 def get_field(client, field):
     if field in client.keys():
         return client[field]
@@ -400,19 +330,35 @@ class MainWindow(Frame):
 
         self.labelframe1 = LabelFrame(self.master)
         self.frame = Frame(self.canvas)
-        self.users = []
+        self.users = {}
         self.init_ui()
         self.i = 0
         self.images = []
 
-    def populate_method(self, method):
-        self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(method))
-        client = ""
-        for item in self.users:
-            if item["_id"] == ObjectId(method):
-                client = item
-                break
-        self.open_profile(client)
+    def edit(self, main_listbox, user_id, listbox, argumets):
+        time = datetime.datetime.now()
+        try:
+            for argument in argumets:
+                if argumets[argument].get():
+                    if modify_fields_user(user_id, argument.cget('text').split(':')[0], argumets[argument].get()):
+                        argument.configure(text="Name: " + argumets[argument].get())
+                        self.users[user_id][argument.cget('text').split(':')[0]] = argumets[argument].get()
+                        listbox.insert(END,
+                                       str(time) + ": updated profile " + str(user_id) + " field name: " + argumets[
+                                           argument].get())
+                        main_listbox.insert(END,
+                                            str(time) + ": updated profile " + str(user_id) + " field name: " +
+                                            argumets[
+                                                argument].get())
+        except Exception:
+            logging.info('Error to update user')
+            main_listbox.insert(END, 'Error to update user')
+
+    def populate_method(self, _id):
+        self.listbox1.insert(END, str(datetime.datetime.now()) + ": opened profile: " + str(_id))
+        if self.users[ObjectId(_id)]:
+            self.open_profile(self.users[ObjectId(_id)])
+        return False
 
     def set_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
@@ -457,7 +403,7 @@ class MainWindow(Frame):
     def on_exit(self):
         self.quit()
 
-    def open_edit(self, value, listbox, name, surname, age, gender, country, home_loc, job_loc):
+    def open_edit(self, user, listbox, name, surname, age, gender, country, home_loc, job_loc):
         t = Toplevel(self)
         t.wm_title("Edit Profile")
         t.geometry("600x700+300+300")
@@ -492,9 +438,9 @@ class MainWindow(Frame):
         checkCmd.set(0)
         row += 1
 
-        choices = ['-', 'male', 'female']
+        choices = ['male', 'female']
         variable = StringVar()
-        variable.set('-')
+        variable.set('')
 
         Label(u_frame, font=('lato', 16), text="Gender :", anchor='w', bd=18, justify="left").grid(row=row, column=1)
         OptionMenu(u_frame, variable, *choices).grid(row=row, column=2)
@@ -502,7 +448,7 @@ class MainWindow(Frame):
         row += 1
 
         country_var = StringVar()
-        country_var.set("-")
+        country_var.set("")
         choice = ['Austria', 'Colombia', 'Italia']
         Label(u_frame, font=('lato', 16), text="Country:", anchor='w', bd=18, justify="left").grid(row=row, column=1)
         OptionMenu(u_frame, country_var, *choice).grid(row=row, column=2)
@@ -518,19 +464,14 @@ class MainWindow(Frame):
         Entry(u_frame, textvariable=job_loc_var, ).grid(row=row, column=2)
 
         row += 1
+        user_edit = {name: name_var, surname: surname_var, age: age_var, gender: variable, country: country_var,
+                     home_loc: home_loc_var, job_loc: job_loc_var}
 
         Button(u_frame, text="Submit", font=('lato', 18), bd=18,
                command=combine_funcs(
-                   (lambda user_id=value["_id"], client=value, listbox=listbox, nme=name, arg1=name_var,
-                           srnme=surname,
-                           arg2=surname_var, age=age,
-                           arg3=age_var, gender=gender, arg4=variable, country=country, arg5=country_var,
-                           home_loc=home_loc, arg6=home_loc_var,
-                           job_loc=job_loc, arg7=job_loc_var
-                    : edit(self.listbox1, user_id, client, listbox, nme, arg1, srnme,
-                           arg2, age, arg3, gender, arg4, country, arg5,
-                           home_loc, arg6, job_loc, arg7)), t.destroy)).grid(row=row,
-                                                                             column=1)
+                   (lambda user_id=user["_id"]: self.edit(self.listbox1, user_id, listbox, user_edit)),
+                   t.destroy)).grid(row=row,
+                                    column=1)
 
         Button(u_frame, text="Close", font=('lato', 18), bd=18, command=t.destroy).grid(row=row,
                                                                                         column=2)
@@ -667,21 +608,24 @@ class MainWindow(Frame):
 
     def update_frame(self, client):
 
-        im = Image.open(os.path.join(KNOWN_FACES_DIR, str(client['_id']) + '_0.png'))
-        im = im.resize((100, 100), Image.ANTIALIAS)
-        photo = ImageTk.PhotoImage(im)
-        print("charging " + str(client['_id']))
-        Button(self.canvas, text=str(client["Name"]) + " " + client[
-            "surname"], image=photo, command=lambda m=str(client["_id"]): self.populate_method(m), font=('lato', 18),
-               bd=18).grid(row=1, column=self.i)
-        self.i += 1
-        self.images.append(photo)
+        try:
+            im = Image.open(os.path.join(KNOWN_FACES_DIR, str(client['_id']) + '_0.png'))
+            im = im.resize((100, 100), Image.ANTIALIAS)
+            photo = ImageTk.PhotoImage(im)
+            print("charging " + str(client['_id']))
+            Button(self.canvas, text=str(client["Name"]) + " " + client[
+                "surname"], image=photo, command=lambda m=str(client["_id"]): self.populate_method(m),
+                   font=('lato', 18),
+                   bd=18).grid(row=1, column=self.i)
+            self.i += 1
+            self.images.append(photo)
+        except Exception:
+            logging.error('Image not found')
 
     def add_user(self, user):
-        for item in self.users:
-            if user["_id"] is item["_id"]:
-                return False
-        self.users.append(user)
+        if user['_id'] in self.users.keys():
+            return False
+        self.users[user['_id']] = user
         print(user)
         self.update_frame(user)
         self.listbox1.insert(END, str(datetime.datetime.now()) + ": added new user : " + user["Name"] + " " + user[
