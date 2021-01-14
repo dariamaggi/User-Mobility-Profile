@@ -22,9 +22,7 @@ from pymongo import MongoClient
 
 # prendere dati da config file
 config = configparser.ConfigParser()
-config.read(
-    os.path.join('/Users/miucio/WorkSpaces/Pycharm/User-Mobility-Profile/UserMobilityProfileManagerModule/files',
-                 'configurations.ini'))
+config.read(os.path.join('/home/pi/Desktop/project/Car_controll', 'configurations.ini'))
 setting = config['settings']
 
 app_gui = ''
@@ -38,7 +36,7 @@ TOLERANCE = 0.6
 FRAME_THICKNESS = 3
 FONT_THICKNESS = 2
 MODEL = 'hog'  # default: 'hog', other one can be 'cnn' - CUDA accelerated (if available) deep-learning pretrained model
-VEHICLE_IN_PORT = 65430
+VEHICLE_IN_PORT = 65432
 VEHICLE_URL = '192.168.1.211'
 
 KNOWN_FACES = []
@@ -50,7 +48,7 @@ CLOUD_URL = '192.168.3.72'
 
 def open_db():
     client = MongoClient(MONGOIP)
-    return client.UserProfileManagerDB
+    return client.CarProfileDB
 
 
 # Want ObjectId not the string of id

@@ -3,16 +3,13 @@ import json
 import logging
 import _thread
 import os
-import pathlib
 import socket  # Import socket module
-import threading
 import time
 import traceback
 import wave
 from ctypes import *
 import pyaudio
 from picamera import PiCamera
-from scipy.io.wavfile import read
 
 form_1 = pyaudio.paInt16
 chans = 1
